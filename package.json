@@ -38,7 +38,7 @@
     "typescript": "^5.2.2"
   },
   "lint-staged": {
-    "src/**/*.{js,json,scss}": "prettier --write --single-quote --tab-width 4 --trailing-comma all"
+    "src/**/*.{js,json,scss, ts}": "prettier --write --single-quote --tab-width 4 --trailing-comma all"
   },
   "devDependencies": {
     "@types/node": "^20.5.7"
