@@ -1,24 +1,24 @@
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm"
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
+@Entity({ name: 'Photo' })
 export class Photo {
     @PrimaryGeneratedColumn()
-    id: number
+    id: number;
 
     @Column({
         length: 100,
     })
-    name: string
+    name: string;
 
-    @Column("text")
-    description: string
-
-    @Column()
-    filename: string
+    @Column('text')
+    description: string;
 
     @Column()
-    views: number
+    filename: string;
 
     @Column()
-    isPublished: boolean
+    views: number;
+
+    @Column()
+    isPublished: boolean;
 }
