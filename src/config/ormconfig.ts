@@ -1,3 +1,5 @@
+import 'dotenv/config'
+import { Photo } from "../entities/Photo"
 module.exports = {
     type: 'postgres',
     host: process.env.DB_HOST,
@@ -5,6 +7,6 @@ module.exports = {
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    entities: ['dist/entities/*.js'],
+    entities: [Photo],
     synchronize: true,
   };
