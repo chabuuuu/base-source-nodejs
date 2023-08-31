@@ -1,5 +1,5 @@
-import 'dotenv/config'
-import { Photo } from "../entities/Photo"
+import 'dotenv/config';
+import { Photo } from '../entities/Photo';
 module.exports = {
     type: 'postgres',
     host: process.env.DB_HOST,
@@ -9,4 +9,4 @@ module.exports = {
     database: process.env.DB_NAME,
     entities: [Photo],
     synchronize: true,
-  };
+};

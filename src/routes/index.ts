@@ -1,10 +1,7 @@
-import { TypeOrmController } from '../controllers/TypeOrmController';
-import { PrismaController } from '../controllers/PrismaController';
-const prismaController = new PrismaController();
-const typeOrmController = new TypeOrmController();
+import { OrmController } from '../controllers/OrmController';
+const ormController = new OrmController();
 function route(app: any) {
-    app.use('/typeorm', typeOrmController.getHome);
-    app.use('/prisma/read-all-data', prismaController.readAllData);
-    app.use('/prisma/add-data', prismaController.addData);
+    app.use('/read-data', ormController.readAllData);
+    app.use('/add-data', ormController.addData);
 }
 module.exports = route;

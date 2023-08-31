@@ -2,7 +2,7 @@ import { log } from 'console';
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 
-const config = require('../config/ormconfig');
+const config = require('../config/type-ormconfig');
 
 const AppDataSource = new DataSource(config);
 
