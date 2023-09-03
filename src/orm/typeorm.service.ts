@@ -11,7 +11,9 @@ export class TypeORMService implements ORMInterface {
         // Kết nối với TypeORM
         db.connect();
     }
-    async addData(): Promise<void> {
+    async addData(req: any, res: any, next: any): Promise<void> {
+        console.log('DANG ADD DATA');
+
         const photo = new Photo();
         photo.name = 'Me and Bears sadasd';
         photo.description = 'I am near polar bears';

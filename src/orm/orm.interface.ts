@@ -1,7 +1,7 @@
 interface ORMInterface {
     connect(): Promise<void>;
-    addData(): Promise<void>;
-    readData(): Promise<void>;
+    addData(req: any, res: any, next: any): Promise<void>;
+    readData(req: any, res: any, next: any): Promise<void>;
     // Thêm các phương thức khác tùy theo nhu cầu
 }
 interface ORM {

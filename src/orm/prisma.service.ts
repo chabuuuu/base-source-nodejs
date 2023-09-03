@@ -10,7 +10,7 @@ export class PrismaService implements ORMInterface {
         // Không cần kết nối riêng vì Prisma đã tự động kết nối
         console.log('connect asdasd');
     }
-    async addData(): Promise<void> {
+    async addData(req: any, res: any, next: any): Promise<void> {
         console.log('add data...');
 
         async function main() {
@@ -37,10 +37,11 @@ export class PrismaService implements ORMInterface {
                 process.exit(1);
             });
     }
-    async readData(): Promise<void> {
+    async readData(req: any, res: any, next: any): Promise<void> {
+        var allPhoto: any;
         async function main() {
-            const allPhoto = await prisma.photo.findMany();
-            console.log(allPhoto);
+            allPhoto = await prisma.photo.findMany();
+            res.send(allPhoto);
         }
 
         main()

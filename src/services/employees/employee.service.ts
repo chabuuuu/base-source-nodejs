@@ -15,11 +15,11 @@ export class EmployeeService {
     async connectORM() {
         await this.orm.connect();
     }
-    async addData() {
-        await this.orm.addData();
+    async addData(req: any, res: any, next: any) {
+        await this.orm.addData(req, res, next);
     }
-    async readAllData() {
-        await this.orm.readData();
+    async readAllData(req: any, res: any, next: any) {
+        await this.orm.readData(req, res, next);
     }
 
     // Triển khai các phương thức CRUD sử dụng this.orm
