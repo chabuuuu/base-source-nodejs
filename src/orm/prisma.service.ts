@@ -54,6 +54,21 @@ export class PrismaService implements ORMInterface {
             await prisma.$disconnect();
         }
     }
+    async deleteData(id: number): Promise<void> {
+        const deleteUser = await prisma.employee.delete({
+            where: {
+                id: id,
+            },
+        });
+    }
+    async updateData(id: number, data: object): Promise<void> {
+        const updateUser = await prisma.employee.update({
+            where: {
+                id: id,
+            },
+            data: data,
+        });
+    }
 
     // Triển khai các phương thức tương tự cho thêm, xóa, sửa dữ liệu
 }

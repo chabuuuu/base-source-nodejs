@@ -37,6 +37,12 @@ export class TypeORMService implements ORMInterface {
         const result: any = data;
         return result;
     }
+    async deleteData(id: number): Promise<void> {
+        await AppDataSource.manager.delete(Employee, { id: id });
+    }
+    async updateData(id: number, data: object): Promise<void> {
+        await AppDataSource.manager.update(Employee, { id: id }, data);
+    }
 
     // Triển khai các phương thức tương tự cho thêm, xóa, sửa dữ liệu
 }

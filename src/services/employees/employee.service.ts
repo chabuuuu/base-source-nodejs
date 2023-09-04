@@ -21,6 +21,12 @@ export class EmployeeService {
     async readAllData(): Promise<void> {
         return await this.orm.readData();
     }
+    async updateData(id: number, data: object): Promise<void> {
+        return await this.orm.updateData(id, data);
+    }
+    async deleteData(id: number): Promise<void> {
+        return await this.orm.deleteData(id);
+    }
 
     // Triển khai các phương thức CRUD sử dụng this.orm
 }
