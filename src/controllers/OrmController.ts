@@ -10,7 +10,7 @@ export class OrmController {
         try {
             const result = await employeeService.readAllData();
             console.log('Read done!');
-            res.send(result);
+            res.render('home', { items: result });
         } catch (error) {
             next(error);
         }
@@ -21,9 +21,15 @@ export class OrmController {
         res.send('Delete done!');
     }
     async updateData(req: any, res: any, next: any) {
-        const data = { full_name: 'name update! by typeorm' };
-        await employeeService.updateData(6, data);
+        const id = req.params.id;
+        const data = req.body;
+        await employeeService.updateData(id, data);
         console.log('Update done!');
         res.send('Update done!');
+    }
+    async edit(req: any, res: any, next: any) {
+        const id: number = req.params.id;
+        var data: any = await employeeService.findData(id);
+        res.render('edit', data);
     }
 }

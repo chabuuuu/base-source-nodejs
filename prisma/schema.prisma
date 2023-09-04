@@ -9,16 +9,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Gender{
-  Nam
-  Nu
-}
+// enum Gender{
+//   Nam
+//   Nu
+// }
 
 model Employee {
   id        Int      @id @default(autoincrement())
   full_name     String   @db.VarChar(100)
   date_of_birth   DateTime
-  gender        Gender     @default(Nam) @map("gender") 
+  gender        String   
   address String
   phone_number String
   email String?

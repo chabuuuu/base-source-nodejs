@@ -1,4 +1,4 @@
-import { ORMInterface } from './orm.interface';
+import { EmployeeData, ORMInterface } from './orm.interface';
 import { PrismaClient } from '@prisma/client';
 import { log } from 'console';
 import { injectable, inject } from 'inversify';
@@ -61,13 +61,23 @@ export class PrismaService implements ORMInterface {
             },
         });
     }
-    async updateData(id: number, data: object): Promise<void> {
+    async updateData(id: number, data: EmployeeData): Promise<void> {
+        data.salary = Number(data.salary);
+        id = Number(id);
         const updateUser = await prisma.employee.update({
             where: {
                 id: id,
             },
             data: data,
         });
+    }
+    async findData(id: number): Promise<void> {
+        const result: any = await prisma.employee.findUnique({
+            where: {
+                id: Number(id),
+            },
+        });
+        return result;
     }
 
     // Triển khai các phương thức tương tự cho thêm, xóa, sửa dữ liệu

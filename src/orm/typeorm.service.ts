@@ -43,6 +43,14 @@ export class TypeORMService implements ORMInterface {
     async updateData(id: number, data: object): Promise<void> {
         await AppDataSource.manager.update(Employee, { id: id }, data);
     }
+    async findData(id: number): Promise<void> {
+        const result: any = await AppDataSource.manager.find(Employee, {
+            where: {
+                id: id,
+            },
+        });
+        return result[0];
+    }
 
     // Triển khai các phương thức tương tự cho thêm, xóa, sửa dữ liệu
 }
