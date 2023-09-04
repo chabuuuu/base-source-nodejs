@@ -8,13 +8,11 @@ const prisma = new PrismaClient();
 export class PrismaService implements ORMInterface {
     async connect() {
         // Không cần kết nối riêng vì Prisma đã tự động kết nối
-        console.log('connect asdasd');
     }
     async addData(req: any, res: any, next: any): Promise<void> {
-        console.log('add data...');
+        console.log('Adding data...');
 
         async function main() {
-            // ... you will write your Prisma Client queries here
             await prisma.photo.create({
                 data: {
                     name: 'prisma',
@@ -41,7 +39,7 @@ export class PrismaService implements ORMInterface {
         var allPhoto: any;
         async function main() {
             allPhoto = await prisma.photo.findMany();
-            res.send(allPhoto);
+            // res.send(allPhoto);
         }
 
         main()
@@ -53,6 +51,8 @@ export class PrismaService implements ORMInterface {
                 await prisma.$disconnect();
                 process.exit(1);
             });
+        console.log('done read');
+        return allPhoto;
     }
 
     // Triển khai các phương thức tương tự cho thêm, xóa, sửa dữ liệu

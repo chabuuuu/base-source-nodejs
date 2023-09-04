@@ -19,7 +19,8 @@ export class EmployeeService {
         await this.orm.addData(req, res, next);
     }
     async readAllData(req: any, res: any, next: any) {
-        await this.orm.readData(req, res, next);
+        const result = await this.orm.readData(req, res, next);
+        console.log(result);
     }
 
     // Triển khai các phương thức CRUD sử dụng this.orm
