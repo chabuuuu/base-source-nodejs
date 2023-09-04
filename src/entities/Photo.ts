@@ -1,24 +1,39 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity({ name: 'Photo' })
-export class Photo {
+@Entity({ name: 'Employee' })
+export class Employee {
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column({
         length: 100,
     })
-    name: string;
-
-    @Column('text')
-    description: string;
+    full_name: string;
 
     @Column()
-    filename: string;
+    date_of_birth: Date;
+
+    @Column({ default: 'Nam' })
+    gender: string;
 
     @Column()
-    views: number;
+    address: string;
 
     @Column()
-    isPublished: boolean;
+    phone_number: string;
+
+    @Column({ nullable: true })
+    email: string;
+
+    @Column()
+    job_title: string;
+
+    @Column()
+    start_date: Date;
+
+    @Column()
+    salary: number;
+
+    @Column({ nullable: true })
+    profile_picture: string;
 }

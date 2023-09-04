@@ -9,11 +9,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Photo {
+enum Gender{
+  Nam
+  Nu
+}
+
+model Employee {
   id        Int      @id @default(autoincrement())
-  name     String   @db.VarChar(255)
-  description   String?
-  filename String?
-  views    Int 
-  isPublished  Boolean
+  full_name     String   @db.VarChar(100)
+  date_of_birth   DateTime
+  gender        Gender     @default(Nam) @map("gender") 
+  address String
+  phone_number String
+  email String?
+  job_title String
+  start_date  DateTime
+  salary  Int
+  profile_picture String?
 }

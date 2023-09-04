@@ -7,8 +7,6 @@ export class OrmController {
         res.send('Done add data!');
     }
     async readAllData(req: any, res: any, next: any) {
-        // const data = await employeeService.readAllData(req, res, next);
-        // res.send(data);
         try {
             const result = await employeeService.readAllData();
             console.log(result);

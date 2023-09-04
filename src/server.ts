@@ -2,7 +2,6 @@ import express from 'express';
 import 'reflect-metadata';
 import 'dotenv/config';
 import 'dotenv/config';
-import { Photo } from './entities/Photo';
 const db = require('../src/data-source/index');
 const route = require('./routes/index');
 const app = express();
