@@ -10,7 +10,7 @@ export class OrmController {
         // const data = await employeeService.readAllData(req, res, next);
         // res.send(data);
         try {
-            const result = await employeeService.readAllData(req, res, next);
+            const result = await employeeService.readAllData();
             console.log(result);
             res.send(result);
         } catch (error) {

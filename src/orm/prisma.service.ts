@@ -35,24 +35,18 @@ export class PrismaService implements ORMInterface {
                 process.exit(1);
             });
     }
-    async readData(req: any, res: any, next: any): Promise<void> {
+    async readData(): Promise<void> {
         var allPhoto: any;
-        async function main() {
+        try {
             allPhoto = await prisma.photo.findMany();
-            // res.send(allPhoto);
+            console.log('Done read all data');
+            return allPhoto;
+        } catch (error) {
+            console.error(error);
+            throw error;
+        } finally {
+            await prisma.$disconnect();
         }
-
-        main()
-            .then(async () => {
-                await prisma.$disconnect();
-            })
-            .catch(async (e) => {
-                console.error(e);
-                await prisma.$disconnect();
-                process.exit(1);
-            });
-        console.log('done read');
-        return allPhoto;
     }
 
     // Triển khai các phương thức tương tự cho thêm, xóa, sửa dữ liệu
