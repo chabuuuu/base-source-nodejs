@@ -1,5 +1,5 @@
-This is a Node.js-based source code that uses the IOC design pattern and PostgreSQL as the database, employing two ORM options: TypeORM and Prisma. The choice between TypeORM and Prisma is determined by the configuration in the .env file, where 1 represents TypeORM, and 2 represents Prisma.
-
-This API manages an employee table, providing CRUD operations (create, read, update, delete). It also includes the capability to upload images and videos.
-
-Additionally, this base source is used for comparing TypeORM and Prisma performance with self-inserted data exceeding 100,000 rows.
+Đây là Nodejs base source xài design partten IOC và cơ sở dữ liệu là postgres sử dụng 2 loại ORM là typeorm và Prisma.
+việc chọn typeorm hay primis là do config ở file .env  1 là typeorm 2 là prisma.
+API này quản lý  table nhân viên. gồm CRUD ( thêm xóa sửa....)
+Chức năng upload hình ảnh/video.
+Base source trên còn được dùng để so sánh giữa TypeORM và Prisma với dữ liệu tự inserv > 100k dòng
