@@ -1,4 +1,4 @@
-import { EmployeeData, ORMInterface } from './orm.interface';
+import { ORMInterface } from './orm.interface';
 import { PrismaClient } from '@prisma/client';
 import { log } from 'console';
 import { injectable, inject } from 'inversify';
@@ -9,24 +9,14 @@ export class PrismaService implements ORMInterface {
     async connect() {
         // Không cần kết nối riêng vì Prisma đã tự động kết nối
     }
-    async addData(req: any, res: any, next: any): Promise<void> {
+    async addData(data: any): Promise<void> {
         console.log('Adding data...');
-
+        data.date_of_birth = new Date(data.date_of_birth);
+        data.start_date = new Date(data.start_date);
+        data.salary = Number(data.salary);
         async function main() {
             await prisma.employee.create({
-                data: {
-                    full_name: 'prisma',
-                    date_of_birth: new Date('2004-03-03'),
-                    gender: 'Nu',
-                    address: '130 Binh Thoi',
-                    phone_number: '0909128321',
-                    email: 'ahsdhdas',
-                    job_title: 'IT',
-                    start_date: new Date('2023-07-08'),
-                    salary: 120000,
-                    profile_picture:
-                        'https://nhadepso.com/wp-content/uploads/2023/03/loa-mat-voi-101-hinh-anh-avatar-meo-cute-dang-yeu-dep-mat_9.jpg',
-                },
+                data: data,
             });
             console.log('Add data done by prisma');
         }
@@ -57,16 +47,16 @@ export class PrismaService implements ORMInterface {
     async deleteData(id: number): Promise<void> {
         const deleteUser = await prisma.employee.delete({
             where: {
-                id: id,
+                id: Number(id),
             },
         });
     }
-    async updateData(id: number, data: EmployeeData): Promise<void> {
+    async updateData(id: number, data: any): Promise<void> {
         data.salary = Number(data.salary);
         id = Number(id);
         const updateUser = await prisma.employee.update({
             where: {
-                id: id,
+                id: Number(id),
             },
             data: data,
         });

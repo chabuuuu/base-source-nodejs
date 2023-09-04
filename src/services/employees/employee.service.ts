@@ -1,6 +1,6 @@
 import { injectable, inject } from 'inversify';
 import 'reflect-metadata';
-import { ORMInterface, EmployeeData } from '../../orm/orm.interface';
+import { ORMInterface } from '../../orm/orm.interface';
 
 @injectable()
 export class EmployeeService {
@@ -15,13 +15,13 @@ export class EmployeeService {
     async connectORM() {
         await this.orm.connect();
     }
-    async addData(req: any, res: any, next: any) {
-        await this.orm.addData(req, res, next);
+    async addData(data: any) {
+        await this.orm.addData(data);
     }
     async readAllData(): Promise<void> {
         return await this.orm.readData();
     }
-    async updateData(id: number, data: EmployeeData): Promise<void> {
+    async updateData(id: number, data: any): Promise<void> {
         return await this.orm.updateData(id, data);
     }
     async deleteData(id: number): Promise<void> {

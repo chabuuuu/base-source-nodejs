@@ -3,8 +3,9 @@ import employeeService from '../config/orm-config';
 import orm from '../config/orm-config';
 export class OrmController {
     async addData(req: any, res: any, next: any) {
-        await employeeService.addData(req, res, next);
-        res.send('Done add data!');
+        const data = req.body;
+        await employeeService.addData(data);
+        res.redirect('/');
     }
     async readAllData(req: any, res: any, next: any) {
         try {
@@ -16,20 +17,24 @@ export class OrmController {
         }
     }
     async deleteData(req: any, res: any, next: any) {
-        await employeeService.deleteData(8);
+        const id = req.params.id;
+        await employeeService.deleteData(id);
         console.log('Delete done!');
-        res.send('Delete done!');
+        res.redirect('/');
     }
     async updateData(req: any, res: any, next: any) {
         const id = req.params.id;
         const data = req.body;
         await employeeService.updateData(id, data);
         console.log('Update done!');
-        res.send('Update done!');
+        res.redirect('/');
     }
     async edit(req: any, res: any, next: any) {
         const id: number = req.params.id;
         var data: any = await employeeService.findData(id);
         res.render('edit', data);
+    }
+    async addDataView(req: any, res: any, next: any) {
+        res.render('add-data');
     }
 }

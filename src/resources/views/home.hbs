@@ -1,7 +1,7 @@
 <mt-4>
     <h3 class="mt-4">Danh sách nhân viên</h3>
     {{!-- <a href="/items/trash">Thùng rác</a> --}}
-    <a href="/add-data">Thêm nhân viên</a>
+    <a href="/add-data-view">Thêm nhân viên</a>
     <table class="table mt-4">
     <thead>
         <tr>
@@ -33,7 +33,7 @@
         <td>{{this.salary}}</td>
         <td>
             <a href="/edit/{{this.id}}" class="btn btn-link">Sửa</a>
-            <a href="" class="btn btn-link" data-toggle="modal" data-id="{{this._id}}" data-target="#delete-item-Modal">Xóa<a>
+            <a href="" class="btn btn-link" data-toggle="modal" data-id="{{this.id}}" data-target="#delete-item-Modal">Xóa<a>
         </td>
         </tr>
         {{else}}
@@ -54,13 +54,13 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Xóa sản phẩm?</h5>
+        <h5 class="modal-title">Xóa nhân viên?</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-        <p>Bạn có chắc chắn muốn xóa sản phẩm này?</p>
+        <p>Bạn có chắc chắn muốn xóa nhân viên này?</p>
       </div>
       <div class="modal-footer">
         <button id="btn-delete-item" class="btn btn-danger">Xóa bỏ</button>
@@ -87,7 +87,7 @@
  
 })
     btnDeleteItem.onclick = function(){
-        deleteForm.action = '/items/'+itemId+'?_method=DELETE';
+        deleteForm.action = '/delete-data/'+itemId+'?_method=DELETE';
         deleteForm.submit();
     }
     });
