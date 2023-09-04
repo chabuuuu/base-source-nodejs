@@ -5,4 +5,4 @@ Việc chọn Typeorm hay Prisma là do config ở file .env 1 là typeorm 2 là
 # Chức năng:
 + Quản lý  table nhân viên. gồm CRUD ( thêm xóa sửa....)
 + Upload hình ảnh/video.
-+ Được dùng để so sánh giữa TypeORM và Prisma với dữ liệu tự inserv > 100k dòng
++ Được dùng để so sánh giữa TypeORM và Prisma với dữ liệu tự insert > 100k dòng
