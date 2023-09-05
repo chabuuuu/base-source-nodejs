@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { Employee } from '../entities/Photo';
+import { Employee } from '../entities/Employee';
 module.exports = {
     type: 'postgres',
     host: process.env.DB_HOST,

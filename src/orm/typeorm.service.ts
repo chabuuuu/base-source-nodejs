@@ -1,5 +1,5 @@
 import { ORMInterface } from './orm.interface';
-import { Employee } from '../entities/Photo';
+import { Employee } from '../entities/Employee';
 import { AppDataSource } from '../data-source/index';
 import { injectable, inject } from 'inversify';
 import 'reflect-metadata';
