@@ -4,6 +4,8 @@ import orm from '../config/orm-config';
 export class OrmController {
     async addData(req: any, res: any, next: any) {
         const data = req.body;
+        console.log(req.body);
+
         await employeeService.addData(data);
         res.redirect('/');
     }

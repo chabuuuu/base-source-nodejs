@@ -1,0 +1,43 @@
+{   
+    "full_name": {
+        "type": "text",
+        "value": "Benchmark"
+    },
+    "gender":{
+        "type": "text",
+        "value": "Nam"
+    },
+
+    "date_of_birth": {
+        "type": "text",
+        "value":"1999-03-03"
+    },
+    "address": {
+        "type": "text",
+        "value": "123 Tan Lap Dong Hoa Di An Binh Duong"
+    },
+    "phone_number": {
+        "type": "text",
+        "value": "0909123"
+    },
+    "email": {
+        "type": "text",
+        "value": "benchamrk@gmail.com"
+    },
+    "job_title": {
+        "type": "text",
+        "value": "Benchmark Engineer"
+    },
+    "start_date": {
+        "type": "text",
+        "value": "2023-03-03"
+    },
+    "salary": {
+        "type": "text",
+        "value": "12000000"
+    },
+    "profile_picture": {
+        "type": "text",
+        "value": "test"
+    }
+}
