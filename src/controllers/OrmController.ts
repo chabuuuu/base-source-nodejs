@@ -7,8 +7,6 @@ export class OrmController {
         // console.log(req.body);
         try {
             const result: any = await employeeService.addData(data);
-            console.log(result);
-
             // res.redirect('/');
             res.json(result);
         } catch (error) {
@@ -44,13 +42,5 @@ export class OrmController {
         console.log('Update done!');
         res.json(data);
         // res.send('Updare done! ID: ' + id + '\nData: ' + {data});
-    }
-    async edit(req: any, res: any, next: any) {
-        const id: number = req.params.id;
-        var data: any = await employeeService.findData(id);
-        res.render('edit', data);
-    }
-    async addDataView(req: any, res: any, next: any) {
-        res.render('add-data');
     }
 }

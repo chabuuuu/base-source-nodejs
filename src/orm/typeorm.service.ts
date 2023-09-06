@@ -15,22 +15,22 @@ export class TypeORMService implements ORMInterface {
         db.connect();
     }
     async addData(data: any): Promise<void> {
-        console.log('DANG ADD DATA');
+        // console.log('DANG ADD DATA');
         const emailUnique = await AppDataSource.manager.find(Employee, {
             where: {
                 email: data.email,
             },
         });
-        if (emailUnique.length != 0) {
-            const error: any = 'Duplicate email';
-            console.log('Duplicate email');
-            return error;
-        }
-        if (EmailValidator.validate(data.email) == false) {
-            const error: any = 'Invalid email';
-            console.log('Invalid email');
-            return error;
-        }
+        // if (emailUnique.length != 0) {
+        //     const error: any = 'Duplicate email';
+        //     console.log('Duplicate email');
+        //     return error;
+        // }
+        // if (EmailValidator.validate(data.email) == false) {
+        //     const error: any = 'Invalid email';
+        //     console.log('Invalid email');
+        //     return error;
+        // }
         data.password = generatePassword.generate();
         await AppDataSource.manager.save(Employee, data);
         console.log('Employee has been saved by typeorm');

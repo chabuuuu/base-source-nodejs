@@ -1,10 +1,8 @@
 const express = require('express');
 const router = express.Router();
-import { OrmController } from '../controllers/OrmController';
-import { UploadController } from '../controllers/UploadController';
-const ormController = new OrmController();
+import { MediaController } from '../controllers/MediaController';
 import multer from 'multer';
-const uploadController = new UploadController();
+const mediaController = new MediaController();
 const path = require('path');
 
 const storage = multer.diskStorage({
@@ -18,6 +16,6 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-router.post('/upload', upload.single('image_video'), uploadController.addImage);
+router.post('/upload', upload.single('image_video'), mediaController.addImage);
 
 module.exports = router;
