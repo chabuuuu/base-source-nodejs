@@ -2,41 +2,76 @@ import { ORMInterface } from './orm.interface';
 import { PrismaClient } from '@prisma/client';
 import { log } from 'console';
 import { injectable, inject } from 'inversify';
+import { emit } from 'process';
+import { GeneratePassword } from '../utils/generatePassword';
+import * as EmailValidator from 'email-validator';
 import 'reflect-metadata';
 const prisma = new PrismaClient();
+const generatePassword = new GeneratePassword();
 @injectable()
 export class PrismaService implements ORMInterface {
     async connect() {
         // Không cần kết nối riêng vì Prisma đã tự động kết nối
     }
     async addData(data: any): Promise<void> {
-        console.log('Adding data...');
         data.date_of_birth = new Date(data.date_of_birth);
         data.start_date = new Date(data.start_date);
         data.salary = Number(data.salary);
-        async function main() {
-            await prisma.employee.create({
-                data: data,
-            });
-            console.log('Add data done by prisma');
-        }
 
-        main()
-            .then(async () => {
-                await prisma.$disconnect();
-            })
-            .catch(async (e) => {
-                console.error(e);
-                await prisma.$disconnect();
-                process.exit(1);
-            });
+        const emailUnique = await prisma.employee.findMany({
+            where: {
+                email: data.email,
+            },
+        });
+        if (emailUnique.length != 0) {
+            const error: any = 'Duplicate email';
+            console.log('duplicate');
+            return error;
+        }
+        if (EmailValidator.validate(data.email) == false) {
+            const erorr: any = 'Invalid email';
+            console.log('Invalid email');
+            return erorr;
+        }
+        data.password = generatePassword.generate();
+        await prisma.employee.create({
+            data: data,
+        });
+        const respond: any = data;
+        console.log('done add data');
+
+        return respond;
     }
-    async readData(): Promise<void> {
+
+    async readData(filter: any): Promise<void> {
+        // $month: new Date('YYYY-07-01T00:00:00Z')
+        const monthBirth = filter.monthBirth;
+        const gender = filter.gender;
+
         var allPhoto: any;
         try {
-            allPhoto = await prisma.employee.findMany();
-            console.log('Done read all data');
-            return allPhoto;
+            // allPhoto = await prisma.employee.findMany({
+            // });
+            let employeeQuerry = 'SELECT * FROM "Employee"';
+            if (monthBirth != null || gender != null) {
+                employeeQuerry += ' WHERE ';
+            }
+            if (monthBirth != null) {
+                employeeQuerry +=
+                    'EXTRACT(MONTH FROM date_of_birth) = ' + monthBirth;
+            }
+            if (monthBirth != null && gender != null) {
+                employeeQuerry += ' AND ';
+            }
+            if (gender != null) {
+                employeeQuerry += "gender = '" + gender + "'";
+            }
+            // console.log(employeeQuerry);
+
+            const respondData: any =
+                await prisma.$queryRawUnsafe(employeeQuerry);
+            console.log('Done read data');
+            return respondData;
         } catch (error) {
             console.error(error);
             throw error;

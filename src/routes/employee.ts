@@ -1,0 +1,12 @@
+const express = require('express');
+const router = express.Router();
+import { OrmController } from '../controllers/OrmController';
+import { UploadController } from '../controllers/UploadController';
+const ormController = new OrmController();
+
+router.get('/', ormController.readAllData);
+router.post('/', ormController.addData);
+router.delete('/:id', ormController.deleteData);
+router.put('/:id', ormController.updateData);
+
+module.exports = router;

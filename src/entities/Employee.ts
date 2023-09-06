@@ -36,4 +36,7 @@ export class Employee {
 
     @Column({ nullable: true })
     profile_picture: string;
+
+    @Column()
+    password: string;
 }

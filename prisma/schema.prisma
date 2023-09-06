@@ -26,4 +26,5 @@ model Employee {
   start_date  DateTime
   salary  Int
   profile_picture String?
+  password  String
 }

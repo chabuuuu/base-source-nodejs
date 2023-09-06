@@ -15,11 +15,11 @@ export class EmployeeService {
     async connectORM() {
         await this.orm.connect();
     }
-    async addData(data: any) {
-        await this.orm.addData(data);
+    async addData(data: any): Promise<void> {
+        return await this.orm.addData(data);
     }
-    async readAllData(): Promise<void> {
-        return await this.orm.readData();
+    async readData(filter: object): Promise<void> {
+        return await this.orm.readData(filter);
     }
     async updateData(id: number, data: any): Promise<void> {
         return await this.orm.updateData(id, data);
