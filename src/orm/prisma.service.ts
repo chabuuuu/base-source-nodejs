@@ -4,10 +4,11 @@ import { log } from 'console';
 import { injectable, inject } from 'inversify';
 import { emit } from 'process';
 import { GeneratePassword } from '../utils/generatePassword';
-import * as EmailValidator from 'email-validator';
+import { ValidateEmail } from '../utils/validateEmail';
 import 'reflect-metadata';
 const prisma = new PrismaClient();
 const generatePassword = new GeneratePassword();
+const validateEmail = new ValidateEmail();
 @injectable()
 export class PrismaService implements ORMInterface {
     async connect() {
@@ -24,15 +25,15 @@ export class PrismaService implements ORMInterface {
             },
         });
         if (emailUnique.length != 0) {
-            const error: any = 'Duplicate email';
             console.log('duplicate');
-            return error;
+            throw new Error('Duplicate email');
+            // return error;
         }
-        if (EmailValidator.validate(data.email) == false) {
-            const erorr: any = 'Invalid email';
-            console.log('Invalid email');
-            return erorr;
+        if (validateEmail.validate(data.email) == false) {
+            throw new Error('Invalid email');
         }
+
+        console.log('Valid email');
         data.password = generatePassword.generate();
         await prisma.employee.create({
             data: data,

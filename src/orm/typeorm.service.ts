@@ -21,16 +21,14 @@ export class TypeORMService implements ORMInterface {
                 email: data.email,
             },
         });
-        // if (emailUnique.length != 0) {
-        //     const error: any = 'Duplicate email';
-        //     console.log('Duplicate email');
-        //     return error;
-        // }
-        // if (EmailValidator.validate(data.email) == false) {
-        //     const error: any = 'Invalid email';
-        //     console.log('Invalid email');
-        //     return error;
-        // }
+        if (emailUnique.length != 0) {
+            console.log('Duplicate email');
+            throw new Error('Duplicate email');
+        }
+        if (EmailValidator.validate(data.email) == false) {
+            console.log('Invalid email');
+            throw new Error('Invalid email');
+        }
         data.password = generatePassword.generate();
         await AppDataSource.manager.save(Employee, data);
         console.log('Employee has been saved by typeorm');
