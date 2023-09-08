@@ -5,6 +5,7 @@ import { injectable, inject } from 'inversify';
 import * as EmailValidator from 'email-validator';
 import { GeneratePassword } from '../utils/generatePassword';
 import 'reflect-metadata';
+import { Column } from 'typeorm';
 const db = require('../data-source/index');
 const generatePassword = new GeneratePassword();
 
@@ -16,6 +17,14 @@ export class TypeORMService implements ORMInterface {
     }
     async addData(data: any): Promise<void> {
         // console.log('DANG ADD DATA');
+        const column = AppDataSource.manager.connection
+            .getMetadata('Employee')
+            .columns.map((column) => column.propertyName);
+        for (const key in data) {
+            if (column.includes(key) == false) {
+                throw new Error('Column does not exist: ' + key);
+            }
+        }
         const emailUnique = await AppDataSource.manager.find(Employee, {
             where: {
                 email: data.email,
@@ -64,6 +73,19 @@ export class TypeORMService implements ORMInterface {
         await AppDataSource.manager.delete(Employee, { id: id });
     }
     async updateData(id: number, data: any): Promise<void> {
+        const emailUnique = await AppDataSource.manager.find(Employee, {
+            where: {
+                email: data.email,
+            },
+        });
+        if (emailUnique.length != 0) {
+            console.log('Duplicate email');
+            throw new Error('Duplicate email');
+        }
+        if (EmailValidator.validate(data.email) == false) {
+            console.log('Invalid email');
+            throw new Error('Invalid email');
+        }
         await AppDataSource.manager.update(Employee, { id: id }, data);
     }
     async findData(id: number): Promise<void> {

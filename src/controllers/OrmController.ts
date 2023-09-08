@@ -6,9 +6,6 @@ const convertStringToObject = new ConverStringToObject();
 export class OrmController {
     async addData(req: any, res: any, next: any) {
         const data = req.body;
-        // res.status(403).send({
-        //     message: "invalid"
-        // })
         try {
             const result: any = await employeeService.addData(data);
             res.json(result);
@@ -19,11 +16,6 @@ export class OrmController {
         }
     }
     async readAllData(req: any, res: any, next: any) {
-        // ?query=[{key:"birthMonth", value: 09},{key: "gender", value: "Nam"}]
-        // const filterData = {
-        //     monthBirth: req.query.monthBirth,
-        //     gender: req.query.gender,
-        // };
         var filterData = {
             monthBirth: null,
             gender: null,
@@ -50,8 +42,14 @@ export class OrmController {
     async updateData(req: any, res: any, next: any) {
         const id = req.params.id;
         const data = req.body;
-        await employeeService.updateData(id, data);
-        console.log('Update done!');
-        res.json(data);
+        try {
+            await employeeService.updateData(id, data);
+            console.log('Update done!');
+            res.json(data);
+        } catch (error: any) {
+            res.status(403).send({
+                message: error.message,
+            });
+        }
     }
 }

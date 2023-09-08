@@ -14,6 +14,7 @@ const upload = multer({ storage: storage });
 export class MediaController {
     async addImage(req: any, res: any, next: any) {
         console.log(res.locals.admin);
+        console.log(req.file.filename);
 
         res.send('Done add image/video');
     }

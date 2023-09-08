@@ -90,6 +90,19 @@ export class PrismaService implements ORMInterface {
     async updateData(id: number, data: any): Promise<void> {
         data.salary = Number(data.salary);
         id = Number(id);
+        const emailUnique = await prisma.employee.findMany({
+            where: {
+                email: data.email,
+            },
+        });
+        if (emailUnique.length != 0) {
+            console.log('duplicate');
+            throw new Error('Duplicate email');
+            // return error;
+        }
+        if (validateEmail.validate(data.email) == false) {
+            throw new Error('Invalid email');
+        }
         const updateUser = await prisma.employee.update({
             where: {
                 id: Number(id),
