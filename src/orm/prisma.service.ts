@@ -5,10 +5,12 @@ import { injectable, inject } from 'inversify';
 import { emit } from 'process';
 import { GeneratePassword } from '../utils/generatePassword';
 import { ValidateEmail } from '../utils/validateEmail';
+import { ValidatePassword } from '../utils/validatePassword';
 import 'reflect-metadata';
 const prisma = new PrismaClient();
 const generatePassword = new GeneratePassword();
 const validateEmail = new ValidateEmail();
+const validatePassword = new ValidatePassword();
 @injectable()
 export class PrismaService implements ORMInterface {
     async connect() {
@@ -34,7 +36,10 @@ export class PrismaService implements ORMInterface {
         }
 
         console.log('Valid email');
-        data.password = generatePassword.generate();
+        // data.password = generatePassword.generate();
+        if (validatePassword.validate(data.password) == false) {
+            throw new Error('Invalid password');
+        }
         await prisma.employee.create({
             data: data,
         });

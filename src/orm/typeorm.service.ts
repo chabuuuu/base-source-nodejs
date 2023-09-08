@@ -4,10 +4,12 @@ import { AppDataSource } from '../data-source/index';
 import { injectable, inject } from 'inversify';
 import * as EmailValidator from 'email-validator';
 import { GeneratePassword } from '../utils/generatePassword';
+import { ValidatePassword } from '../utils/validatePassword';
 import 'reflect-metadata';
 import { Column } from 'typeorm';
 const db = require('../data-source/index');
 const generatePassword = new GeneratePassword();
+const validatePassword = new ValidatePassword();
 
 @injectable()
 export class TypeORMService implements ORMInterface {
@@ -38,7 +40,10 @@ export class TypeORMService implements ORMInterface {
             console.log('Invalid email');
             throw new Error('Invalid email');
         }
-        data.password = generatePassword.generate();
+        if (validatePassword.validate(data.password) == false) {
+            console.log('Invalid password');
+            throw new Error('Invalid password');
+        }
         await AppDataSource.manager.save(Employee, data);
         console.log('Employee has been saved by typeorm');
         const respond: any = data;
