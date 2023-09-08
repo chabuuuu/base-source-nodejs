@@ -5,11 +5,13 @@ import { injectable, inject } from 'inversify';
 import * as EmailValidator from 'email-validator';
 import { GeneratePassword } from '../utils/generatePassword';
 import { ValidatePassword } from '../utils/validatePassword';
+import { ValidatePhone } from '../utils/validatePhone';
 import 'reflect-metadata';
 import { Column } from 'typeorm';
 const db = require('../data-source/index');
 const generatePassword = new GeneratePassword();
 const validatePassword = new ValidatePassword();
+const validatePhone = new ValidatePhone();
 
 @injectable()
 export class TypeORMService implements ORMInterface {
@@ -43,6 +45,10 @@ export class TypeORMService implements ORMInterface {
         if (validatePassword.validate(data.password) == false) {
             console.log('Invalid password');
             throw new Error('Invalid password');
+        }
+        if (validatePhone.validate(data.phone_number) == false) {
+            console.log('Invalid phone number');
+            throw new Error('Invalid phone number');
         }
         await AppDataSource.manager.save(Employee, data);
         console.log('Employee has been saved by typeorm');
@@ -94,6 +100,10 @@ export class TypeORMService implements ORMInterface {
         if (validatePassword.validate(data.password) == false) {
             console.log('Invalid password');
             throw new Error('Invalid password');
+        }
+        if (validatePhone.validate(data.phone_number) == false) {
+            console.log('Invalid phone number');
+            throw new Error('Invalid phone number');
         }
         await AppDataSource.manager.update(Employee, { id: id }, data);
     }

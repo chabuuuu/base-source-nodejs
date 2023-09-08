@@ -6,11 +6,13 @@ import { emit } from 'process';
 import { GeneratePassword } from '../utils/generatePassword';
 import { ValidateEmail } from '../utils/validateEmail';
 import { ValidatePassword } from '../utils/validatePassword';
+import { ValidatePhone } from '../utils/validatePhone';
 import 'reflect-metadata';
 const prisma = new PrismaClient();
 const generatePassword = new GeneratePassword();
 const validateEmail = new ValidateEmail();
 const validatePassword = new ValidatePassword();
+const validatePhone = new ValidatePhone();
 @injectable()
 export class PrismaService implements ORMInterface {
     async connect() {
@@ -39,6 +41,9 @@ export class PrismaService implements ORMInterface {
         // data.password = generatePassword.generate();
         if (validatePassword.validate(data.password) == false) {
             throw new Error('Invalid password');
+        }
+        if (validatePhone.validate(data.phone_number) == false) {
+            throw new Error('Invalid phone number');
         }
         await prisma.employee.create({
             data: data,
@@ -110,6 +115,9 @@ export class PrismaService implements ORMInterface {
         }
         if (validatePassword.validate(data.password) == false) {
             throw new Error('Invalid password');
+        }
+        if (validatePhone.validate(data.phone_number) == false) {
+            throw new Error('Invalid phone number');
         }
         const updateUser = await prisma.employee.update({
             where: {

@@ -4,17 +4,36 @@ import { MediaController } from '../controllers/MediaController';
 import multer from 'multer';
 const mediaController = new MediaController();
 const path = require('path');
+const maxSize = 1000000000;
+var fileType = '';
+var upload;
 
 const storage = multer.diskStorage({
     destination: (req: any, file: any, cb: any) => {
         cb(null, 'storage/data');
     },
     filename: (req: any, file: any, cb: any) => {
-        console.log(file);
+        console.log(file.mimetype);
+        fileType = file.mimetype;
+        console.log(fileType);
+
         cb(null, Date.now() + path.extname(file.originalname));
     },
 });
-const upload = multer({ storage: storage });
+
+if (fileType.localeCompare('video/mp4')) {
+    upload = multer({
+        storage: storage,
+        limits: {
+            fileSize: maxSize,
+        },
+    });
+} else {
+    upload = multer({
+        storage: storage,
+    });
+}
+
 router.post('/upload', upload.single('image_video'), mediaController.addImage);
 router.post('/upload', mediaController.addImage);
 
