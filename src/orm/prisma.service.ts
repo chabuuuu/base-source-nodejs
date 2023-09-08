@@ -108,6 +108,9 @@ export class PrismaService implements ORMInterface {
         if (validateEmail.validate(data.email) == false) {
             throw new Error('Invalid email');
         }
+        if (validatePassword.validate(data.password) == false) {
+            throw new Error('Invalid password');
+        }
         const updateUser = await prisma.employee.update({
             where: {
                 id: Number(id),

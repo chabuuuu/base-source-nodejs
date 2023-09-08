@@ -91,6 +91,10 @@ export class TypeORMService implements ORMInterface {
             console.log('Invalid email');
             throw new Error('Invalid email');
         }
+        if (validatePassword.validate(data.password) == false) {
+            console.log('Invalid password');
+            throw new Error('Invalid password');
+        }
         await AppDataSource.manager.update(Employee, { id: id }, data);
     }
     async findData(id: number): Promise<void> {

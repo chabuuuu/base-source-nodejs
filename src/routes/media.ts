@@ -15,15 +15,7 @@ const storage = multer.diskStorage({
     },
 });
 const upload = multer({ storage: storage });
-router.post(
-    '/upload',
-    function (req: any, res: any, next: any) {
-        res.locals.admin = true;
-        next();
-    },
-    upload.single('image_video'),
-    mediaController.addImage,
-);
+router.post('/upload', upload.single('image_video'), mediaController.addImage);
 router.post('/upload', mediaController.addImage);
 
 module.exports = router;
