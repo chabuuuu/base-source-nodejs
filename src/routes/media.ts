@@ -4,7 +4,7 @@ import { MediaController } from '../controllers/MediaController';
 import multer from 'multer';
 const mediaController = new MediaController();
 const path = require('path');
-const maxSize = 1000000000;
+const maxSize = 500 * 1024 * 1024;
 var fileType = '';
 var upload;
 

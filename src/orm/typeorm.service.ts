@@ -6,12 +6,14 @@ import * as EmailValidator from 'email-validator';
 import { GeneratePassword } from '../utils/generatePassword';
 import { ValidatePassword } from '../utils/validatePassword';
 import { ValidatePhone } from '../utils/validatePhone';
+import { HashPassword } from '../utils/hashPassword';
 import 'reflect-metadata';
 import { Column } from 'typeorm';
 const db = require('../data-source/index');
 const generatePassword = new GeneratePassword();
 const validatePassword = new ValidatePassword();
 const validatePhone = new ValidatePhone();
+const hashPassword = new HashPassword();
 
 @injectable()
 export class TypeORMService implements ORMInterface {
@@ -46,6 +48,7 @@ export class TypeORMService implements ORMInterface {
             console.log('Invalid password');
             throw new Error('Invalid password');
         }
+        data.password = await hashPassword.hash(data.password);
         if (validatePhone.validate(data.phone_number) == false) {
             console.log('Invalid phone number');
             throw new Error('Invalid phone number');
@@ -107,13 +110,24 @@ export class TypeORMService implements ORMInterface {
         }
         await AppDataSource.manager.update(Employee, { id: id }, data);
     }
-    async findData(id: number): Promise<void> {
+    async login(email: string, password: string): Promise<void> {
         const result: any = await AppDataSource.manager.find(Employee, {
             where: {
-                id: id,
+                email: email,
             },
         });
-        return result[0];
+        if (result[0] == null) {
+            throw new Error('Error: User does not exist');
+        }
+        const match: any = await hashPassword.compare(
+            password,
+            result[0].password,
+        );
+        if (match) {
+            return result[0];
+        } else {
+            throw new Error('Error: Login failed');
+        }
     }
 
     // Triển khai các phương thức tương tự cho thêm, xóa, sửa dữ liệu

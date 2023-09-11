@@ -27,8 +27,8 @@ export class EmployeeService {
     async deleteData(id: number): Promise<void> {
         return await this.orm.deleteData(id);
     }
-    async findData(id: number): Promise<void> {
-        return await this.orm.findData(id);
+    async login(email: string, password: string): Promise<void> {
+        return await this.orm.login(email, password);
     }
 
     // Triển khai các phương thức CRUD sử dụng this.orm

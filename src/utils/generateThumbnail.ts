@@ -25,7 +25,9 @@ export class GenerateThumbnail {
         console.log(outputPattern);
         // const command = `ffmpeg -i ${file} -vf select=‘eq(pict_type,I)*lt(n,10)’ -vsync 2 -s 320x240 -f image2 ${outputPattern}`
         // const command =  `ffmpeg -i ${file} -vf "select='eq(pict_type,PICT_TYPE_I)*lt(n,10)',scale=1920:1080" -q:v 2 -vsync vfr ${outputPattern}`;
-        const command = `ffmpeg -i ${file} -q:v 3 -f segment -segment_format mjpeg -segment_wrap ${numberOfFrames} -segment_time ${distance} ${outputPattern}`;
+        // const command = `ffmpeg -i ${file} -q:v 3 -f segment -segment_format mjpeg -segment_wrap ${numberOfFrames} -segment_time ${distance} ${outputPattern}`;
+        const command = `ffmpeg -i ${file} -q:v 3 -f segment -segment_format mjpeg -segment_wrap ${numberOfFrames} -segment_time ${distance} -vf format=gray ${outputPattern}`;
+
         try {
             const { stdout, stderr } = await exec(command);
             console.log('stdout:', stdout);

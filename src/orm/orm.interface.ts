@@ -4,7 +4,7 @@ interface ORMInterface {
     readData(filter: object): Promise<void>;
     updateData(id: number, data: any): Promise<void>;
     deleteData(id: number): Promise<void>;
-    findData(id: number): Promise<void>;
+    login(email: string, password: string): Promise<void>;
 }
 // interface EmployeeData {
 //     full_name: string;

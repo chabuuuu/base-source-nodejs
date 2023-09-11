@@ -1,18 +1,21 @@
 import { ORMInterface } from './orm.interface';
 import { PrismaClient } from '@prisma/client';
-import { log } from 'console';
+import { error, log } from 'console';
 import { injectable, inject } from 'inversify';
 import { emit } from 'process';
 import { GeneratePassword } from '../utils/generatePassword';
 import { ValidateEmail } from '../utils/validateEmail';
 import { ValidatePassword } from '../utils/validatePassword';
 import { ValidatePhone } from '../utils/validatePhone';
+import { HashPassword } from '../utils/hashPassword';
+import { ErrorWithStatus } from '../interfaces/ErrorWithStatus.interface';
 import 'reflect-metadata';
 const prisma = new PrismaClient();
 const generatePassword = new GeneratePassword();
 const validateEmail = new ValidateEmail();
 const validatePassword = new ValidatePassword();
 const validatePhone = new ValidatePhone();
+const hashPassword = new HashPassword();
 @injectable()
 export class PrismaService implements ORMInterface {
     async connect() {
@@ -42,6 +45,8 @@ export class PrismaService implements ORMInterface {
         if (validatePassword.validate(data.password) == false) {
             throw new Error('Invalid password');
         }
+        const password = await hashPassword.hash(data.password);
+        data.password = password;
         if (validatePhone.validate(data.phone_number) == false) {
             throw new Error('Invalid phone number');
         }
@@ -126,13 +131,25 @@ export class PrismaService implements ORMInterface {
             data: data,
         });
     }
-    async findData(id: number): Promise<void> {
-        const result: any = await prisma.employee.findUnique({
-            where: {
-                id: Number(id),
-            },
-        });
-        return result;
+    async login(email: string, password: string): Promise<void> {
+        try {
+            const result: any = await prisma.employee.findFirstOrThrow({
+                where: {
+                    email: email,
+                },
+            });
+            const match: any = await hashPassword.compare(
+                password,
+                result.password,
+            );
+            if (match) {
+                return result;
+            } else {
+                throw new Error('Login failed');
+            }
+        } catch (error: any) {
+            throw new Error(error);
+        }
     }
 
     // Triển khai các phương thức tương tự cho thêm, xóa, sửa dữ liệu

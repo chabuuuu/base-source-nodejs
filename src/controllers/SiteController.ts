@@ -3,7 +3,7 @@ import employeeService from '../config/orm-config';
 export class SiteController {
     async edit(req: any, res: any, next: any) {
         const id: number = req.params.id;
-        var data: any = await employeeService.findData(id);
+        var data = '';
         res.render('edit', data);
     }
     async addData(req: any, res: any, next: any) {

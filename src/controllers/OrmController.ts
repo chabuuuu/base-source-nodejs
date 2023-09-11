@@ -2,6 +2,7 @@ import { error } from 'console';
 import employeeService from '../config/orm-config';
 import { ConverStringToObject } from '../utils/convertStringToObject';
 import orm from '../config/orm-config';
+import { ErrorWithStatus } from '../interfaces/ErrorWithStatus.interface';
 const convertStringToObject = new ConverStringToObject();
 export class OrmController {
     async addData(req: any, res: any, next: any) {
@@ -46,6 +47,19 @@ export class OrmController {
             await employeeService.updateData(id, data);
             console.log('Update done!');
             res.json(data);
+        } catch (error: any) {
+            res.status(403).send({
+                message: error.message,
+            });
+        }
+    }
+    async login(req: any, res: any, next: any) {
+        const email = req.body.email;
+        const password = req.body.password;
+        try {
+            const user = await employeeService.login(email, password);
+            console.log('Login!');
+            res.json(user);
         } catch (error: any) {
             res.status(403).send({
                 message: error.message,

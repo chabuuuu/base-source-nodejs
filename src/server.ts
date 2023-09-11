@@ -2,6 +2,8 @@ import express from 'express';
 import 'reflect-metadata';
 import 'dotenv/config';
 import 'dotenv/config';
+import { error } from 'console';
+import { ErrorWithStatus } from './interfaces/ErrorWithStatus.interface';
 const path = require('path');
 const route = require('./routes/index');
 const app = express();
