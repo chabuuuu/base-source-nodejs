@@ -1,5 +1,5 @@
 # Description
-Đây là Nodejs base source xài design partten IOC và cơ sở dữ liệu là postgres sử dụng 2 loại ORM là Typeorm và Prisma.
+Đây là Nodejs API base source xài design partten IOC và cơ sở dữ liệu là postgres sử dụng 2 loại ORM là Typeorm và Prisma.
 # Config
 Việc chọn Typeorm hay Prisma là do config ở file .env 1 là typeorm 2 là prisma.
 # Chức năng:
