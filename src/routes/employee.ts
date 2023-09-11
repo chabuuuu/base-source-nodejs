@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-import { OrmController } from '../controllers/OrmController';
-const ormController = new OrmController();
+import { EmployeeController } from '../controllers/EmployeeController';
+const employeeController = new EmployeeController();
 
-router.post('/login', ormController.login);
-router.get('/', ormController.readAllData);
-router.post('/', ormController.addData);
-router.delete('/:id', ormController.deleteData);
-router.put('/:id', ormController.updateData);
+router.post('/login', employeeController.login);
+router.get('/', employeeController.readAllData);
+router.post('/', employeeController.addData);
+router.delete('/:id', employeeController.deleteData);
+router.put('/:id', employeeController.updateData);
 module.exports = router;

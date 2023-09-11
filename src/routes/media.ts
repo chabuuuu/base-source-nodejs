@@ -21,7 +21,7 @@ const storage = multer.diskStorage({
     },
 });
 
-if (fileType.localeCompare('video/mp4')) {
+if (fileType.includes('video')) {
     upload = multer({
         storage: storage,
         limits: {
@@ -35,6 +35,6 @@ if (fileType.localeCompare('video/mp4')) {
 }
 
 router.post('/upload', upload.single('image_video'), mediaController.addImage);
-router.post('/upload', mediaController.addImage);
+// router.post('/upload', mediaController.addImage);
 
 module.exports = router;

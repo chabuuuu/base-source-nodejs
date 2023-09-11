@@ -1,52 +1,60 @@
 const path = require('path');
 import { unlink } from 'node:fs/promises';
 const sharp = require('sharp');
-import { exec } from 'child_process';
+// import { exec } from 'child_process';
 import { GenerateThumbnail } from '../utils/generateThumbnail';
+import { ConvertFilteType } from '../utils/convertFileType';
+const util = require('util');
+const exec = util.promisify(require('child_process').exec);
 const generateThumbnail = new GenerateThumbnail();
-// const ffmpegStatic = require('ffmpeg-static');
-// const ffmpeg = require('fluent-ffmpeg');
-// ffmpeg.setFfmpegPath(ffmpegStatic);
+const convertFileType = new ConvertFilteType();
 export class MediaController {
     async addImage(req: any, res: any, next: any) {
-        // console.log(req.file.filename);
-        const filename = req.file.filename;
-        const fileType = req.file.mimetype;
-        const inputFilePath = process.env.ROOT + '/storage/data/' + filename;
+        var fileType = req.file.mimetype.split('/')[1];
+        fileType = convertFileType.convert(fileType);
+        const videoQuality = 720;
+        const aspectRatio = '16:9';
+        const filename = req.file.filename.split('.')[0];
+        const mediaType = req.file.mimetype.split('/')[0];
+        const inputFilePath =
+            process.env.ROOT + '/storage/data/' + filename + '.' + fileType;
         const outputFilePath =
-            process.env.ROOT + '/storage/data/resize_' + filename;
+            process.env.ROOT + '/storage/data/resize_' + filename + '.mp4';
         const thumbnailNumber = 10;
-        console.log('video type:' + fileType);
-        console.log(filename);
-        if (fileType == 'video/mp4') {
+        var ratio = aspectRatio.split(':');
+        const height = videoQuality;
+        const width = (height * Number(ratio[0])) / Number(ratio[1]);
+        console.log(width + 'x' + height);
+        console.log('File type:' + fileType);
+        console.log('File name: ' + filename);
+        console.log('Media type: ' + mediaType);
+
+        if (mediaType == 'video') {
+            console.log('Insert video...');
+            console.log('resize video...');
+            const command = `ffmpeg -i ${inputFilePath} -vf "scale=${width}:${height}" ${outputFilePath}`;
+            try {
+                const { stdout, stderr } = await exec(command);
+                console.log('stdout:', stdout);
+                console.log('stderr:', stderr);
+                await unlink('storage/data/' + filename + '.' + fileType);
+                console.log('Successfully deleted');
+            } catch (error: any) {
+                console.log(error);
+                throw new Error(error);
+            }
             console.log('Generate thumbnail...');
             await generateThumbnail.generate(
-                inputFilePath,
+                outputFilePath,
                 filename,
                 thumbnailNumber,
             );
-
-            console.log('resize video...');
-            const newWidth = 640; // Độ rộng mới cho video
-            const newHeight = 480; // Độ cao mới cho video
-
-            const command = `ffmpeg -i ${inputFilePath} -vf "scale=${newWidth}:${newHeight}" ${outputFilePath}`;
-
-            await exec(command, async (error, stdout, stderr) => {
-                if (error) {
-                    console.error('Lỗi khi thay đổi kích thước video: ', error);
-                } else {
-                    console.log('Hoàn thành thay đổi kích thước video.');
-                    await unlink('storage/data/' + filename);
-                    console.log('successfully deleted');
-                }
-            });
         } else {
             try {
                 await sharp('storage/data/' + filename)
                     .resize({
-                        width: 150,
-                        height: 97,
+                        width: width,
+                        height: height,
                     })
                     .toFile('storage/data/' + 'resize_' + filename);
                 await unlink('storage/data/' + filename);

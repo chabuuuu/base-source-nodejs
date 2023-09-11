@@ -4,7 +4,7 @@ import { ConverStringToObject } from '../utils/convertStringToObject';
 import orm from '../config/orm-config';
 import { ErrorWithStatus } from '../interfaces/ErrorWithStatus.interface';
 const convertStringToObject = new ConverStringToObject();
-export class OrmController {
+export class EmployeeController {
     async addData(req: any, res: any, next: any) {
         const data = req.body;
         try {

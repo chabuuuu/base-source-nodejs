@@ -13,14 +13,11 @@ export class GenerateThumbnail {
         });
         var distance = videoDuration / 10;
         console.log('distance' + distance);
-        const outputname = filename.split('.');
-        fs.mkdirSync(
-            process.env.ROOT + '/storage/data/thumbnail/' + outputname[0],
-        );
+        fs.mkdirSync(process.env.ROOT + '/storage/data/thumbnail/' + filename);
         const outputPattern =
             process.env.ROOT +
             '/storage/data/thumbnail/' +
-            outputname[0] +
+            filename +
             '/%03d.png';
         console.log(outputPattern);
         // const command = `ffmpeg -i ${file} -vf select=‘eq(pict_type,I)*lt(n,10)’ -vsync 2 -s 320x240 -f image2 ${outputPattern}`
