@@ -10,6 +10,7 @@ import { HashPassword } from '../utils/hashPassword';
 import 'reflect-metadata';
 import { Column } from 'typeorm';
 const db = require('../data-source/index');
+const validateSchema = require('../Schema/EmployeeSchema');
 const generatePassword = new GeneratePassword();
 const validatePassword = new ValidatePassword();
 const validatePhone = new ValidatePhone();
@@ -23,13 +24,16 @@ export class TypeORMService implements ORMInterface {
     }
     async addData(data: any): Promise<void> {
         // console.log('DANG ADD DATA');
-        const column = AppDataSource.manager.connection
-            .getMetadata('Employee')
-            .columns.map((column) => column.propertyName);
-        for (const key in data) {
-            if (column.includes(key) == false) {
-                throw new Error('Column does not exist: ' + key);
-            }
+        // const column = AppDataSource.manager.connection
+        //     .getMetadata('Employee')
+        //     .columns.map((column) => column.propertyName);
+        // for (const key in data) {
+        //     if (column.includes(key) == false) {
+        //         throw new Error('Column does not exist: ' + key);
+        //     }
+        // }
+        if (validateSchema(data) == false) {
+            throw new Error(validateSchema.errors[0].message);
         }
         const emailUnique = await AppDataSource.manager.find(Employee, {
             where: {

@@ -11,6 +11,7 @@ import { HashPassword } from '../utils/hashPassword';
 import { ErrorWithStatus } from '../interfaces/ErrorWithStatus.interface';
 import 'reflect-metadata';
 const prisma = new PrismaClient();
+const validateSchema = require('../Schema/EmployeeSchema');
 const generatePassword = new GeneratePassword();
 const validateEmail = new ValidateEmail();
 const validatePassword = new ValidatePassword();
@@ -22,10 +23,14 @@ export class PrismaService implements ORMInterface {
         // Không cần kết nối riêng vì Prisma đã tự động kết nối
     }
     async addData(data: any): Promise<void> {
+        if (validateSchema(data) == false) {
+            console.log(validateSchema.errors);
+
+            throw new Error(validateSchema.errors[0].message);
+        }
         data.date_of_birth = new Date(data.date_of_birth);
         data.start_date = new Date(data.start_date);
         data.salary = Number(data.salary);
-
         const emailUnique = await prisma.employee.findMany({
             where: {
                 email: data.email,
