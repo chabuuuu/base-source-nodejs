@@ -1,11 +1,19 @@
 // import { exec } from 'child_process';
 const { getVideoDurationInSeconds } = require('get-video-duration');
+import { injectable } from 'inversify';
 import path from 'path';
+import { GenerateThumbnailInterface } from '../../interfaces/media.interface';
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 const fs = require('fs');
-export class GenerateThumbnail {
-    async generate(file: string, filename: string, numberOfFrames: number) {
+import 'reflect-metadata';
+@injectable()
+export class GenerateThumbnail implements GenerateThumbnailInterface {
+    public async generate(
+        file: string,
+        filename: string,
+        numberOfFrames: number,
+    ) {
         var videoDuration: any;
         await getVideoDurationInSeconds(file).then((duration: any) => {
             console.log(duration);
@@ -20,11 +28,7 @@ export class GenerateThumbnail {
             filename +
             '/%03d.png';
         console.log(outputPattern);
-        // const command = `ffmpeg -i ${file} -vf select=‘eq(pict_type,I)*lt(n,10)’ -vsync 2 -s 320x240 -f image2 ${outputPattern}`
-        // const command =  `ffmpeg -i ${file} -vf "select='eq(pict_type,PICT_TYPE_I)*lt(n,10)',scale=1920:1080" -q:v 2 -vsync vfr ${outputPattern}`;
-        // const command = `ffmpeg -i ${file} -q:v 3 -f segment -segment_format mjpeg -segment_wrap ${numberOfFrames} -segment_time ${distance} ${outputPattern}`;
         const command = `ffmpeg -i ${file} -q:v 3 -f segment -segment_format mjpeg -segment_wrap ${numberOfFrames} -segment_time ${distance} -vf format=gray ${outputPattern}`;
-
         try {
             const { stdout, stderr } = await exec(command);
             console.log('stdout:', stdout);

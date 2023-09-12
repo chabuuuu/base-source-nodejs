@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-import { MediaController } from '../controllers/MediaController';
 import multer from 'multer';
+import 'reflect-metadata';
+import { MediaController } from '../controllers/MediaController';
 const mediaController = new MediaController();
 const path = require('path');
 const maxSize = 500 * 1024 * 1024;
@@ -34,7 +35,6 @@ if (fileType.includes('video')) {
     });
 }
 
-router.post('/upload', upload.single('image_video'), mediaController.addImage);
-// router.post('/upload', mediaController.addImage);
+router.post('/upload', upload.single('image_video'), mediaController.upload);
 
 module.exports = router;
