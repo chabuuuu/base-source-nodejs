@@ -62,12 +62,24 @@ export class TypeORMService implements ORMInterface {
         const respond: any = data;
         return respond;
     }
-    async readData(filter: any): Promise<void> {
+    async readData(
+        filter: any,
+        page: any,
+        perPage: any,
+        skip: any,
+    ): Promise<void> {
         // const data = await AppDataSource.manager.find(Employee, {});
         // const result: any = data;
         // return result;
         const monthBirth = filter.monthBirth;
         const gender = filter.gender;
+        perPage = perPage?.toString();
+        skip = skip?.toString();
+        const pageQuery = `LIMIT ${perPage} OFFSET ${skip}`;
+        const parameters: any = {
+            perPage: perPage,
+            skip: skip,
+        };
 
         let employeeQuerry = 'SELECT * FROM "Employee"';
         if (monthBirth != null || gender != null) {
@@ -83,9 +95,19 @@ export class TypeORMService implements ORMInterface {
         if (gender != null) {
             employeeQuerry += "gender = '" + gender + "'";
         }
+        employeeQuerry += pageQuery;
 
         const data = await AppDataSource.manager.query(employeeQuerry);
-        return data;
+        const totalCountQuery = `SELECT COUNT(*) AS total FROM "Employee"`;
+        const totalCount = await AppDataSource.manager.query(totalCountQuery);
+        console.log(data);
+        const result: any = {
+            data: data,
+            page: page,
+            perPage: perPage,
+            totalCount: totalCount[0],
+        };
+        return result;
     }
     async deleteData(id: number): Promise<void> {
         await AppDataSource.manager.delete(Employee, { id: id });

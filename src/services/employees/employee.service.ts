@@ -18,8 +18,13 @@ export class EmployeeService {
     async addData(data: any): Promise<void> {
         return await this.orm.addData(data);
     }
-    async readData(filter: object): Promise<void> {
-        return await this.orm.readData(filter);
+    async readData(
+        filter: object,
+        page: any,
+        perPage: any,
+        skip: any,
+    ): Promise<void> {
+        return await this.orm.readData(filter, page, perPage, skip);
     }
     async updateData(id: number, data: any): Promise<void> {
         return await this.orm.updateData(id, data);

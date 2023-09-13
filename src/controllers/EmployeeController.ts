@@ -17,17 +17,26 @@ export class EmployeeController {
         }
     }
     async readAllData(req: any, res: any, next: any) {
+        var query: any = req.query.query;
+        const page: any = req.query.page || 10;
+        const perPage: any = req.query.perPage || 10;
+        const skip = (page - 1) * perPage;
         var filterData = {
             monthBirth: null,
             gender: null,
         };
-        var query: any = req.query.query;
+
         if (query != null) {
             filterData = convertStringToObject.convert(query);
         }
         console.log(filterData);
         try {
-            const result: any = await employeeService.readData(filterData);
+            const result: any = await employeeService.readData(
+                filterData,
+                page,
+                perPage,
+                skip,
+            );
             console.log('Read done!');
             res.json(result);
         } catch (error) {

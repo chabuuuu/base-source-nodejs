@@ -13,7 +13,7 @@ export class SiteController {
         res.render('add-image_video');
     }
     async home(req: any, res: any, next: any) {
-        const result: any = await employeeService.readData({});
+        const result: any = await employeeService.readData({}, '10', '10', '0');
         console.log('Read done!');
         res.render('home', { result: result });
     }
