@@ -4,6 +4,7 @@ import 'dotenv/config';
 import 'dotenv/config';
 import { error } from 'console';
 import { ErrorWithStatus } from './interfaces/ErrorWithStatus.interface';
+import BaseError from './utils/BaseError';
 const path = require('path');
 const route = require('./routes/index');
 const app = express();
