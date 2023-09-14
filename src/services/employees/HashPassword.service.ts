@@ -1,7 +1,11 @@
 import * as bcrypt from 'bcrypt';
+import { injectable } from 'inversify';
+import { HashPasswordInterface } from '../../interfaces/employee.interface';
+import 'reflect-metadata';
 const saltRounds = 10;
-export class HashPassword {
-    async hash(password: string): Promise<void> {
+@injectable()
+export class HashPassword implements HashPasswordInterface {
+    public async hash(password: string): Promise<void> {
         try {
             const salt = await bcrypt.genSaltSync(saltRounds);
             const hash: any = await bcrypt.hashSync(password, salt);
@@ -10,7 +14,7 @@ export class HashPassword {
             throw new Error('Cant hash password');
         }
     }
-    async compare(password: string, hash: string): Promise<void> {
+    public async compare(password: string, hash: string): Promise<void> {
         try {
             const result: any = await bcrypt.compareSync(password, hash); // true
             return result;

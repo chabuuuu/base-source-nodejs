@@ -17,7 +17,7 @@ import {
     GENERATETHUMBNAIL,
     CONVERTFILETYPE,
     RESIZEVIDEO,
-} from '../../config/types';
+} from '../../config/types/media.types';
 
 @injectable()
 export class MediaUploadService implements MediaUploadInterface {

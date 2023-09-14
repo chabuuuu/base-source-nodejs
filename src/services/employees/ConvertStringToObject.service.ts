@@ -1,5 +1,10 @@
-export class ConverStringToObject {
-    convert(query: any): any {
+import { injectable } from 'inversify';
+import { ConverStringToObjectInterface } from '../../interfaces/employee.interface';
+import 'reflect-metadata';
+
+@injectable()
+export class ConverStringToObject implements ConverStringToObjectInterface {
+    public convert(query: any): any {
         const filterData = {
             monthBirth: null,
             gender: null,

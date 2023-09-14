@@ -1,8 +1,8 @@
 const express = require('express');
 import 'reflect-metadata';
-import container from '../config/inversify.config';
+import container from '../config/media.config';
 import { MediaUploadInterface } from '../interfaces/media.interface';
-import { MEDIAUPLOAD } from '../config/types';
+import { MEDIAUPLOAD } from '../config/types/media.types';
 const mediaUploadService = container.get<MediaUploadInterface>(MEDIAUPLOAD);
 
 export class MediaController {

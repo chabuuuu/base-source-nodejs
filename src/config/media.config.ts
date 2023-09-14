@@ -8,7 +8,7 @@ import {
     CONVERTFILETYPE,
     MEDIAUPLOAD,
     RESIZEVIDEO,
-} from './types';
+} from './types/media.types';
 import { ResizeVideo } from '../services/media/ResizeVideo.service';
 const container = new Container();
 

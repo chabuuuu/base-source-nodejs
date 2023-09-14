@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import 'dotenv/config';
-import { EmployeeService } from '../services/employees/employee.service';
-import ormModule from '../orm/orm.module';
+import { EmployeeService } from '../services/employees/Employee.service';
+import ormModule from '../config/employee.config';
 import { Container } from 'inversify';
 import { ORMInterface } from '../orm/orm.interface';
 const globalContainer = new Container();

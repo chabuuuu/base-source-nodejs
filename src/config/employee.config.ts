@@ -1,7 +1,19 @@
-import { ContainerModule, interfaces } from 'inversify';
-import { TypeORMService } from './typeorm.service';
-import { PrismaService } from './prisma.service';
-import { ORMInterface } from './orm.interface';
+import { Container, ContainerModule, interfaces } from 'inversify';
+import { TypeORMService } from '../orm/typeorm.service';
+import { PrismaService } from '../orm/prisma.service';
+import { ORMInterface } from '../orm/orm.interface';
+import {
+    CONVERTSTRINGTOOBJECT,
+    HASHPASSWORD,
+    VALIDATEEMAIL,
+    VALIDATEPASSWORD,
+    VALIDATEPHONE,
+} from './types/employee.type';
+import { HashPassword } from '../services/employees/HashPassword.service';
+import { ValidateEmail } from '../services/employees/ValidateEmail.service';
+import { ValidatePassword } from '../services/employees/ValidatePassword.service';
+import { ValidatePhone } from '../services/employees/ValidatePhone.service';
+import { ConverStringToObject } from '../services/employees/ConvertStringToObject.service';
 const db = require('../data-source/index');
 
 async function connect() {
@@ -11,6 +23,10 @@ async function connect() {
 const ormModule = new ContainerModule(
     (bind: interfaces.Bind, unbind: interfaces.Unbind) => {
         const selectedORM = process.env.SELECTED_ORM || 'typeorm';
+        bind(HASHPASSWORD).to(HashPassword);
+        bind(VALIDATEEMAIL).to(ValidateEmail);
+        bind(VALIDATEPASSWORD).to(ValidatePassword);
+        bind(VALIDATEPHONE).to(ValidatePhone);
 
         if (selectedORM === 'typeorm') {
             bind<ORMInterface>('ORMInterface')

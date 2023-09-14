@@ -1,9 +1,11 @@
-import { error } from 'console';
 import employeeService from '../config/orm-config';
-import { ConverStringToObject } from '../utils/convertStringToObject';
-import orm from '../config/orm-config';
-import { ErrorWithStatus } from '../interfaces/ErrorWithStatus.interface';
-const convertStringToObject = new ConverStringToObject();
+import { ConverStringToObjectInterface } from '../interfaces/employee.interface';
+import ormModule from '../config/employee.config';
+import container from '../config/employeeController.config';
+import { CONVERTSTRINGTOOBJECT } from '../config/types/employee.type';
+const convertStringToObject = container.get<ConverStringToObjectInterface>(
+    CONVERTSTRINGTOOBJECT,
+);
 export class EmployeeController {
     async addData(req: any, res: any, next: any) {
         const data = req.body;

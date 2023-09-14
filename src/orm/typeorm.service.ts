@@ -2,36 +2,44 @@ import { ORMInterface } from './orm.interface';
 import { Employee } from '../entities/Employee';
 import { AppDataSource } from '../data-source/index';
 import { injectable, inject } from 'inversify';
-import * as EmailValidator from 'email-validator';
-import { GeneratePassword } from '../utils/generatePassword';
-import { ValidatePassword } from '../utils/validatePassword';
-import { ValidatePhone } from '../utils/validatePhone';
-import { HashPassword } from '../utils/hashPassword';
 import 'reflect-metadata';
-import { Column } from 'typeorm';
+import {
+    HashPasswordInterface,
+    ValidateEmailInterface,
+    ValidatePasswordInterface,
+    ValidatePhoneInterface,
+} from '../interfaces/employee.interface';
+import {
+    HASHPASSWORD,
+    VALIDATEEMAIL,
+    VALIDATEPASSWORD,
+    VALIDATEPHONE,
+} from '../config/types/employee.type';
 const db = require('../data-source/index');
 const validateSchema = require('../Schema/EmployeeSchema');
-const generatePassword = new GeneratePassword();
-const validatePassword = new ValidatePassword();
-const validatePhone = new ValidatePhone();
-const hashPassword = new HashPassword();
 
 @injectable()
 export class TypeORMService implements ORMInterface {
+    private hashPassWord: HashPasswordInterface;
+    private validateEmail: ValidateEmailInterface;
+    private validatePassword: ValidatePasswordInterface;
+    private validatePhone: ValidatePhoneInterface;
+    constructor(
+        @inject(HASHPASSWORD) hashPassword: HashPasswordInterface,
+        @inject(VALIDATEEMAIL) validateEmail: ValidateEmailInterface,
+        @inject(VALIDATEPASSWORD) validatePassword: ValidatePasswordInterface,
+        @inject(VALIDATEPHONE) validatePhone: ValidatePhoneInterface,
+    ) {
+        this.hashPassWord = hashPassword;
+        this.validateEmail = validateEmail;
+        this.validatePassword = validatePassword;
+        this.validatePhone = validatePhone;
+    }
     async connect() {
         // Kết nối với TypeORM
         db.connect();
     }
     async addData(data: any): Promise<void> {
-        // console.log('DANG ADD DATA');
-        // const column = AppDataSource.manager.connection
-        //     .getMetadata('Employee')
-        //     .columns.map((column) => column.propertyName);
-        // for (const key in data) {
-        //     if (column.includes(key) == false) {
-        //         throw new Error('Column does not exist: ' + key);
-        //     }
-        // }
         if (validateSchema(data) == false) {
             throw new Error(validateSchema.errors[0].message);
         }
@@ -44,16 +52,16 @@ export class TypeORMService implements ORMInterface {
             console.log('Duplicate email');
             throw new Error('Duplicate email');
         }
-        if (EmailValidator.validate(data.email) == false) {
+        if (this.validateEmail.validate(data.email) == false) {
             console.log('Invalid email');
             throw new Error('Invalid email');
         }
-        if (validatePassword.validate(data.password) == false) {
+        if (this.validatePassword.validate(data.password) == false) {
             console.log('Invalid password');
             throw new Error('Invalid password');
         }
-        data.password = await hashPassword.hash(data.password);
-        if (validatePhone.validate(data.phone_number) == false) {
+        data.password = await this.hashPassWord.hash(data.password);
+        if (this.validatePhone.validate(data.phone_number) == false) {
             console.log('Invalid phone number');
             throw new Error('Invalid phone number');
         }
@@ -68,19 +76,11 @@ export class TypeORMService implements ORMInterface {
         perPage: any,
         skip: any,
     ): Promise<void> {
-        // const data = await AppDataSource.manager.find(Employee, {});
-        // const result: any = data;
-        // return result;
         const monthBirth = filter.monthBirth;
         const gender = filter.gender;
         perPage = perPage?.toString();
         skip = skip?.toString();
         const pageQuery = `LIMIT ${perPage} OFFSET ${skip}`;
-        const parameters: any = {
-            perPage: perPage,
-            skip: skip,
-        };
-
         let employeeQuerry = 'SELECT * FROM "Employee"';
         if (monthBirth != null || gender != null) {
             employeeQuerry += ' WHERE ';
@@ -113,26 +113,49 @@ export class TypeORMService implements ORMInterface {
         await AppDataSource.manager.delete(Employee, { id: id });
     }
     async updateData(id: number, data: any): Promise<void> {
-        const emailUnique = await AppDataSource.manager.find(Employee, {
-            where: {
-                email: data.email,
-            },
-        });
-        if (emailUnique.length != 0) {
-            console.log('Duplicate email');
-            throw new Error('Duplicate email');
+        var schema = {
+            full_name: data.full_name,
+            date_of_birth: data.date_of_birth || '',
+            gender: data.gender || '',
+            address: data.address || '',
+            phone_number: data.phone_number || '',
+            email: data.email || '',
+            job_title: data.job_title || '',
+            start_date: data.start_date || '',
+            salary: data.salary || '',
+            profile_picture: data.profile_picture || '',
+            password: data.password || '',
+        };
+        Object.assign(schema, data);
+        if (validateSchema(schema) == false) {
+            throw new Error(validateSchema.errors[0].message);
         }
-        if (EmailValidator.validate(data.email) == false) {
-            console.log('Invalid email');
-            throw new Error('Invalid email');
+        if (data.email != null) {
+            const emailUnique = await AppDataSource.manager.find(Employee, {
+                where: {
+                    email: data.email,
+                },
+            });
+            if (emailUnique.length != 0) {
+                console.log('Duplicate email');
+                throw new Error('Duplicate email');
+            }
+            if (this.validateEmail.validate(data.email) == false) {
+                console.log('Invalid email');
+                throw new Error('Invalid email');
+            }
         }
-        if (validatePassword.validate(data.password) == false) {
-            console.log('Invalid password');
-            throw new Error('Invalid password');
+        if (data.password != null) {
+            if (this.validatePassword.validate(data.password) == false) {
+                console.log('Invalid password');
+                throw new Error('Invalid password');
+            }
         }
-        if (validatePhone.validate(data.phone_number) == false) {
-            console.log('Invalid phone number');
-            throw new Error('Invalid phone number');
+        if (data.phone_number != null) {
+            if (this.validatePhone.validate(data.phone_number) == false) {
+                console.log('Invalid phone number');
+                throw new Error('Invalid phone number');
+            }
         }
         await AppDataSource.manager.update(Employee, { id: id }, data);
     }
@@ -145,7 +168,7 @@ export class TypeORMService implements ORMInterface {
         if (result[0] == null) {
             throw new Error('Error: User does not exist');
         }
-        const match: any = await hashPassword.compare(
+        const match: any = await this.hashPassWord.compare(
             password,
             result[0].password,
         );
