@@ -1,9 +1,8 @@
 import { Container, ContainerModule, interfaces } from 'inversify';
-import { TypeORMService } from '../orm/typeorm.service';
-import { PrismaService } from '../orm/prisma.service';
-import { ORMInterface } from '../orm/orm.interface';
+import { TypeORMService } from '../services/employees/orm/typeorm.service';
+import { PrismaService } from '../services/employees/orm/prisma.service';
+import { ORMInterface } from '../interfaces/orm.interface';
 import {
-    CONVERTSTRINGTOOBJECT,
     HASHPASSWORD,
     VALIDATEEMAIL,
     VALIDATEPASSWORD,
@@ -13,7 +12,6 @@ import { HashPassword } from '../services/employees/HashPassword.service';
 import { ValidateEmail } from '../services/employees/ValidateEmail.service';
 import { ValidatePassword } from '../services/employees/ValidatePassword.service';
 import { ValidatePhone } from '../services/employees/ValidatePhone.service';
-import { ConverStringToObject } from '../services/employees/ConvertStringToObject.service';
 const db = require('../data-source/index');
 
 async function connect() {

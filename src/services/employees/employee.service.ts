@@ -1,6 +1,6 @@
 import { injectable, inject } from 'inversify';
 import 'reflect-metadata';
-import { ORMInterface } from '../../orm/orm.interface';
+import { ORMInterface } from '../../interfaces/orm.interface';
 
 @injectable()
 export class EmployeeService {

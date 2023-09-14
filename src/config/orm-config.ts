@@ -3,7 +3,7 @@ import 'dotenv/config';
 import { EmployeeService } from '../services/employees/Employee.service';
 import ormModule from '../config/employee.config';
 import { Container } from 'inversify';
-import { ORMInterface } from '../orm/orm.interface';
+import { ORMInterface } from '../interfaces/orm.interface';
 const globalContainer = new Container();
 
 globalContainer.load(ormModule);
