@@ -13,9 +13,7 @@ export class EmployeeController {
             const result: any = await employeeService.addData(data);
             res.json(result);
         } catch (error: any) {
-            res.status(403).send({
-                message: error.message,
-            });
+            next(error);
         }
     }
     async readAllData(req: any, res: any, next: any) {
@@ -47,9 +45,13 @@ export class EmployeeController {
     }
     async deleteData(req: any, res: any, next: any) {
         const id = req.params.id;
-        await employeeService.deleteData(id);
-        console.log('Delete done!');
-        res.send('Delete done! ID: ' + id);
+        try {
+            await employeeService.deleteData(id);
+            console.log('Delete done!');
+            res.send('Delete done! ID: ' + id);
+        } catch (error) {
+            next(error);
+        }
     }
     async updateData(req: any, res: any, next: any) {
         const id = req.params.id;
@@ -59,9 +61,7 @@ export class EmployeeController {
             console.log('Update done!');
             res.json(data);
         } catch (error: any) {
-            res.status(403).send({
-                message: error.message,
-            });
+            next(error);
         }
     }
     async login(req: any, res: any, next: any) {
@@ -72,9 +72,7 @@ export class EmployeeController {
             console.log('Login!');
             res.json(user);
         } catch (error: any) {
-            res.status(403).send({
-                message: error.message,
-            });
+            next(error);
         }
     }
 }

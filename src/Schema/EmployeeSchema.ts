@@ -29,4 +29,4 @@ const schema = {
     additionalProperties: false,
 };
 const validate = ajv.compile(schema);
-module.exports = validate;
+module.exports = { schema, validate };

@@ -5,6 +5,7 @@ import { injectable, inject } from 'inversify';
 import { emit } from 'process';
 import { ErrorWithStatus } from '../../../interfaces/ErrorWithStatus.interface';
 import 'reflect-metadata';
+import { HttpStatusCode } from '../../../utils/ErrorStatusCode';
 import {
     HashPasswordInterface,
     ValidateEmailInterface,
@@ -17,9 +18,9 @@ import {
     VALIDATEPASSWORD,
     VALIDATEPHONE,
 } from '../../../config/types/employee.type';
+import BaseError from '../../../utils/BaseError';
 const prisma = new PrismaClient();
-const validateSchema = require('../../../Schema/EmployeeSchema');
-
+const { schema, validate } = require('../../../Schema/EmployeeSchema');
 @injectable()
 export class PrismaService implements ORMInterface {
     private hashPassWord: HashPasswordInterface;
@@ -41,10 +42,34 @@ export class PrismaService implements ORMInterface {
         // Không cần kết nối riêng vì Prisma đã tự động kết nối
     }
     async addData(data: any): Promise<void> {
-        if (validateSchema(data) == false) {
-            console.log(validateSchema.errors);
-
-            throw new Error(validateSchema.errors[0].message);
+        if (validate(data) == false) {
+            const schemaProperties = Object.keys(schema.properties);
+            const userProperties = Object.keys(data);
+            const missingColumns = schemaProperties.filter(
+                (column) => !userProperties.includes(column),
+            );
+            const extraColumns = userProperties.filter(
+                (column) => !schemaProperties.includes(column),
+            );
+            if (missingColumns.length != 0) {
+                throw new BaseError(
+                    HttpStatusCode.UNPROCESSABLE_ENTITY,
+                    'fail',
+                    'Must have required properties: ' + missingColumns,
+                );
+            }
+            if (extraColumns.length != 0) {
+                throw new BaseError(
+                    HttpStatusCode.UNPROCESSABLE_ENTITY,
+                    'fail',
+                    'Must not have properties: ' + extraColumns,
+                );
+            }
+            throw new BaseError(
+                HttpStatusCode.UNPROCESSABLE_ENTITY,
+                'fail',
+                validate.errors[0].message,
+            );
         }
         data.date_of_birth = new Date(data.date_of_birth);
         data.start_date = new Date(data.start_date);
@@ -56,22 +81,42 @@ export class PrismaService implements ORMInterface {
         });
         if (emailUnique.length != 0) {
             console.log('duplicate');
-            throw new Error('Duplicate email');
+            // throw new Error('Duplicate email');
+            throw new BaseError(
+                HttpStatusCode.CONFLICT,
+                'fail',
+                'Duplicate email',
+            );
             // return error;
         }
         if (this.validateEmail.validate(data.email) == false) {
-            throw new Error('Invalid email');
+            // throw new Error('Invalid email');
+            throw new BaseError(
+                HttpStatusCode.BAD_REQUEST,
+                'fail',
+                'Invalid email',
+            );
         }
 
         console.log('Valid email');
         // data.password = generatePassword.generate();
         if (this.validatePassword.validate(data.password) == false) {
-            throw new Error('Invalid password');
+            // throw new Error('Invalid password');
+            throw new BaseError(
+                HttpStatusCode.BAD_REQUEST,
+                'fail',
+                'Invalid password',
+            );
         }
         const password = await this.hashPassWord.hash(data.password);
         data.password = password;
         if (this.validatePhone.validate(data.phone_number) == false) {
-            throw new Error('Invalid phone number');
+            // throw new Error('Invalid phone number');
+            throw new BaseError(
+                HttpStatusCode.BAD_REQUEST,
+                'fail',
+                'Invalid phone number',
+            );
         }
         await prisma.employee.create({
             data: data,
@@ -127,23 +172,41 @@ export class PrismaService implements ORMInterface {
                 totalCount: totalCount[0].toString(),
             };
             return result;
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            throw error;
+            throw new BaseError(
+                HttpStatusCode.BAD_REQUEST,
+                'fail',
+                error.message,
+            );
         } finally {
             await prisma.$disconnect();
         }
     }
     async deleteData(id: number): Promise<void> {
-        const deleteUser = await prisma.employee.delete({
-            where: {
-                id: Number(id),
-            },
-        });
+        try {
+            await prisma.employee.findFirstOrThrow({
+                where: {
+                    id: Number(id),
+                },
+            });
+            const deleteUser: any = await prisma.employee.delete({
+                where: {
+                    id: Number(id),
+                },
+            });
+            return deleteUser;
+        } catch (error: any) {
+            throw new BaseError(
+                HttpStatusCode.INTERNAL_SERVER,
+                'fail',
+                error.message,
+            );
+        }
     }
     async updateData(id: number, data: any): Promise<void> {
-        var schema = {
-            full_name: data.full_name,
+        var updateSchema = {
+            full_name: data.full_name || '',
             date_of_birth: data.date_of_birth || '',
             gender: data.gender || '',
             address: data.address || '',
@@ -155,9 +218,35 @@ export class PrismaService implements ORMInterface {
             profile_picture: data.profile_picture || '',
             password: data.password || '',
         };
-        Object.assign(schema, data);
-        if (validateSchema(schema) == false) {
-            throw new Error(validateSchema.errors[0].message);
+        Object.assign(updateSchema, data);
+        if (validate(updateSchema) == false) {
+            const schemaProperties = Object.keys(schema.properties);
+            const userProperties = Object.keys(updateSchema);
+            const missingColumns = schemaProperties.filter(
+                (column) => !userProperties.includes(column),
+            );
+            const extraColumns = userProperties.filter(
+                (column) => !schemaProperties.includes(column),
+            );
+            if (missingColumns.length != 0) {
+                throw new BaseError(
+                    HttpStatusCode.UNPROCESSABLE_ENTITY,
+                    'fail',
+                    'Must have required properties: ' + missingColumns,
+                );
+            }
+            if (extraColumns.length != 0) {
+                throw new BaseError(
+                    HttpStatusCode.UNPROCESSABLE_ENTITY,
+                    'fail',
+                    'Must not have properties: ' + extraColumns,
+                );
+            }
+            throw new BaseError(
+                HttpStatusCode.UNPROCESSABLE_ENTITY,
+                'fail',
+                validate.errors[0].message,
+            );
         }
         data.salary = Number(data.salary);
         id = Number(id);
@@ -169,29 +258,53 @@ export class PrismaService implements ORMInterface {
             });
             if (emailUnique.length != 0) {
                 console.log('duplicate');
-                throw new Error('Duplicate email');
+                throw new BaseError(
+                    HttpStatusCode.CONFLICT,
+                    'fail',
+                    'Duplicate email',
+                );
                 // return error;
             }
             if (this.validateEmail.validate(data.email) == false) {
-                throw new Error('Invalid email');
+                throw new BaseError(
+                    HttpStatusCode.BAD_REQUEST,
+                    'fail',
+                    'Invalid email',
+                );
             }
         }
         if (data.password != null) {
             if (this.validatePassword.validate(data.password) == false) {
-                throw new Error('Invalid password');
+                throw new BaseError(
+                    HttpStatusCode.BAD_REQUEST,
+                    'fail',
+                    'Invalid password',
+                );
             }
         }
         if (data.phone_number != null) {
             if (this.validatePhone.validate(data.phone_number) == false) {
-                throw new Error('Invalid phone number');
+                throw new BaseError(
+                    HttpStatusCode.BAD_REQUEST,
+                    'fail',
+                    'Invalid phone number',
+                );
             }
         }
-        const updateUser = await prisma.employee.update({
-            where: {
-                id: Number(id),
-            },
-            data: data,
-        });
+        try {
+            const updateUser = await prisma.employee.update({
+                where: {
+                    id: Number(id),
+                },
+                data: data,
+            });
+        } catch (error: any) {
+            throw new BaseError(
+                HttpStatusCode.INTERNAL_SERVER,
+                'fail',
+                error.message,
+            );
+        }
     }
     async login(email: string, password: string): Promise<void> {
         try {
@@ -207,10 +320,18 @@ export class PrismaService implements ORMInterface {
             if (match) {
                 return result;
             } else {
-                throw new Error('Login failed');
+                throw new BaseError(
+                    HttpStatusCode.UNAUTHORIZED,
+                    'fail',
+                    'Login failed',
+                );
             }
         } catch (error: any) {
-            throw new Error(error);
+            throw new BaseError(
+                HttpStatusCode.INTERNAL_SERVER,
+                'fail',
+                error.message,
+            );
         }
     }
 
