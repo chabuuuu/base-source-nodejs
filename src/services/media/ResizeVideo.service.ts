@@ -3,6 +3,11 @@ import { ResizeVideoInterFace } from '../../interfaces/media.interface';
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 import { unlink } from 'node:fs/promises';
+import { stdout } from 'node:process';
+import { spawnSync } from 'child_process';
+import { unlinkSync } from 'fs';
+import { spawn } from 'child_process';
+import { FfmpegProgressBar } from './FfmpegProgressBar.service';
 
 @injectable()
 export class ResizeVideo implements ResizeVideoInterFace {
@@ -14,16 +19,22 @@ export class ResizeVideo implements ResizeVideoInterFace {
         fileName: string,
         fileType: string,
     ) {
-        const command = `ffmpeg -i ${inputFilePath} -vf "scale=${width}:${height}" ${outputFilePath}`;
+        const command = [
+            '-i',
+            inputFilePath,
+            '-vf',
+            `scale=${width}:${height}`,
+            outputFilePath,
+        ];
+        const ffmpegProgressBar = new FfmpegProgressBar(inputFilePath);
+        // Tiến trình đã kết thúc thành công
         try {
-            const { stdout, stderr } = await exec(command);
-            console.log('stdout:', stdout);
-            console.log('stderr:', stderr);
-            await unlink('storage/data/' + fileName + '.' + fileType);
+            await ffmpegProgressBar.exec(command);
+            unlinkSync('storage/data/' + fileName + '.' + fileType);
             console.log('Successfully deleted');
-        } catch (error: any) {
-            console.log(error);
-            throw new Error(error);
+        } catch (error) {
+            console.error(error);
+            throw error;
         }
     }
 }

@@ -3,6 +3,7 @@ import { unlink } from 'node:fs/promises';
 const sharp = require('sharp');
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
+const cliProgress = require('cli-progress');
 
 //Inversify
 import { injectable, inject } from 'inversify'; // Import injectable và inject
@@ -18,6 +19,8 @@ import {
     CONVERTFILETYPE,
     RESIZEVIDEO,
 } from '../../config/types/media.types';
+import BaseError from '../../utils/BaseError';
+import { HttpStatusCode } from '../../utils/ErrorStatusCode';
 
 @injectable()
 export class MediaUploadService implements MediaUploadInterface {
@@ -58,6 +61,7 @@ export class MediaUploadService implements MediaUploadInterface {
         aspectRatio: string,
         thubnailNumber: number,
     ) {
+        console.log('File: ' + req.file);
         var fileMimeType = req.file.mimetype.split('/')[1];
         this.fileType = this.convertFileType.convert(fileMimeType);
         this.videoQuality = 720;
@@ -81,7 +85,9 @@ export class MediaUploadService implements MediaUploadInterface {
     public async upload(req: any, res: any, next: any) {
         if (this.mediaType == 'video') {
             console.log('Insert video...');
+
             console.log('resize video...');
+
             await this.resizeVideo.resize(
                 this.inputFilePath,
                 this.width,
@@ -90,6 +96,7 @@ export class MediaUploadService implements MediaUploadInterface {
                 this.fileName,
                 this.fileType,
             );
+
             console.log('Generate thumbnail...');
             await this.generateThumbnail.generate(
                 this.outputFilePath,
