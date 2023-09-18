@@ -15,8 +15,10 @@ import {
     VALIDATEPASSWORD,
     VALIDATEPHONE,
 } from '../../../config/types/employee.type';
+import BaseError from '../../../utils/BaseError';
+import { HttpStatusCode } from '../../../utils/ErrorStatusCode';
 const db = require('../../../data-source/index');
-const validateSchema = require('../../../Schema/EmployeeSchema');
+const { schema, validate } = require('../../../Schema/EmployeeSchema');
 
 @injectable()
 export class TypeORMService implements ORMInterface {
@@ -40,8 +42,34 @@ export class TypeORMService implements ORMInterface {
         db.connect();
     }
     async addData(data: any): Promise<void> {
-        if (validateSchema(data) == false) {
-            throw new Error(validateSchema.errors[0].message);
+        if (validate(data) == false) {
+            const schemaProperties = Object.keys(schema.properties);
+            const userProperties = Object.keys(data);
+            const missingColumns = schemaProperties.filter(
+                (column) => !userProperties.includes(column),
+            );
+            const extraColumns = userProperties.filter(
+                (column) => !schemaProperties.includes(column),
+            );
+            if (missingColumns.length != 0) {
+                throw new BaseError(
+                    HttpStatusCode.UNPROCESSABLE_ENTITY,
+                    'fail',
+                    'Must have required properties: ' + missingColumns,
+                );
+            }
+            if (extraColumns.length != 0) {
+                throw new BaseError(
+                    HttpStatusCode.UNPROCESSABLE_ENTITY,
+                    'fail',
+                    'Must not have properties: ' + extraColumns,
+                );
+            }
+            throw new BaseError(
+                HttpStatusCode.UNPROCESSABLE_ENTITY,
+                'fail',
+                validate.errors[0].message,
+            );
         }
         const emailUnique = await AppDataSource.manager.find(Employee, {
             where: {
@@ -50,20 +78,36 @@ export class TypeORMService implements ORMInterface {
         });
         if (emailUnique.length != 0) {
             console.log('Duplicate email');
-            throw new Error('Duplicate email');
+            throw new BaseError(
+                HttpStatusCode.CONFLICT,
+                'fail',
+                'Duplicate email',
+            );
         }
         if (this.validateEmail.validate(data.email) == false) {
             console.log('Invalid email');
-            throw new Error('Invalid email');
+            throw new BaseError(
+                HttpStatusCode.BAD_REQUEST,
+                'fail',
+                'Invalid email',
+            );
         }
         if (this.validatePassword.validate(data.password) == false) {
             console.log('Invalid password');
-            throw new Error('Invalid password');
+            throw new BaseError(
+                HttpStatusCode.BAD_REQUEST,
+                'fail',
+                'Invalid password',
+            );
         }
         data.password = await this.hashPassWord.hash(data.password);
         if (this.validatePhone.validate(data.phone_number) == false) {
             console.log('Invalid phone number');
-            throw new Error('Invalid phone number');
+            throw new BaseError(
+                HttpStatusCode.BAD_REQUEST,
+                'fail',
+                'Invalid phone number',
+            );
         }
         await AppDataSource.manager.save(Employee, data);
         console.log('Employee has been saved by typeorm');
@@ -96,24 +140,53 @@ export class TypeORMService implements ORMInterface {
             employeeQuerry += "gender = '" + gender + "'";
         }
         employeeQuerry += pageQuery;
-
-        const data = await AppDataSource.manager.query(employeeQuerry);
-        const totalCountQuery = `SELECT COUNT(*) AS total FROM "Employee"`;
-        const totalCount = await AppDataSource.manager.query(totalCountQuery);
-        console.log(data);
-        const result: any = {
-            data: data,
-            page: page,
-            perPage: perPage,
-            totalCount: totalCount[0],
-        };
-        return result;
+        try {
+            const data = await AppDataSource.manager.query(employeeQuerry);
+            const totalCountQuery = `SELECT COUNT(*) AS total FROM "Employee"`;
+            const totalCount =
+                await AppDataSource.manager.query(totalCountQuery);
+            console.log(data);
+            const result: any = {
+                data: data,
+                page: page,
+                perPage: perPage,
+                totalCount: totalCount[0],
+            };
+            return result;
+        } catch (error: any) {
+            console.error(error);
+            throw new BaseError(
+                HttpStatusCode.BAD_REQUEST,
+                'fail',
+                error.message,
+            );
+        }
     }
     async deleteData(id: number): Promise<void> {
-        await AppDataSource.manager.delete(Employee, { id: id });
+        const result: any = await AppDataSource.manager.find(Employee, {
+            where: {
+                id: id,
+            },
+        });
+        if (result[0] == null) {
+            throw new BaseError(
+                HttpStatusCode.BAD_REQUEST,
+                'fail',
+                'User does not exist',
+            );
+        }
+        try {
+            await AppDataSource.manager.delete(Employee, { id: id });
+        } catch (error: any) {
+            throw new BaseError(
+                HttpStatusCode.INTERNAL_SERVER,
+                'fail',
+                error.message,
+            );
+        }
     }
     async updateData(id: number, data: any): Promise<void> {
-        var schema = {
+        var updateSchema = {
             full_name: data.full_name,
             date_of_birth: data.date_of_birth || '',
             gender: data.gender || '',
@@ -126,9 +199,35 @@ export class TypeORMService implements ORMInterface {
             profile_picture: data.profile_picture || '',
             password: data.password || '',
         };
-        Object.assign(schema, data);
-        if (validateSchema(schema) == false) {
-            throw new Error(validateSchema.errors[0].message);
+        Object.assign(updateSchema, data);
+        if (validate(updateSchema) == false) {
+            const schemaProperties = Object.keys(schema.properties);
+            const userProperties = Object.keys(updateSchema);
+            const missingColumns = schemaProperties.filter(
+                (column) => !userProperties.includes(column),
+            );
+            const extraColumns = userProperties.filter(
+                (column) => !schemaProperties.includes(column),
+            );
+            if (missingColumns.length != 0) {
+                throw new BaseError(
+                    HttpStatusCode.UNPROCESSABLE_ENTITY,
+                    'fail',
+                    'Must have required properties: ' + missingColumns,
+                );
+            }
+            if (extraColumns.length != 0) {
+                throw new BaseError(
+                    HttpStatusCode.UNPROCESSABLE_ENTITY,
+                    'fail',
+                    'Must not have properties: ' + extraColumns,
+                );
+            }
+            throw new BaseError(
+                HttpStatusCode.UNPROCESSABLE_ENTITY,
+                'fail',
+                validate.errors[0].message,
+            );
         }
         if (data.email != null) {
             const emailUnique = await AppDataSource.manager.find(Employee, {
@@ -138,44 +237,96 @@ export class TypeORMService implements ORMInterface {
             });
             if (emailUnique.length != 0) {
                 console.log('Duplicate email');
-                throw new Error('Duplicate email');
+                throw new BaseError(
+                    HttpStatusCode.CONFLICT,
+                    'fail',
+                    'Duplicate email',
+                );
             }
             if (this.validateEmail.validate(data.email) == false) {
                 console.log('Invalid email');
-                throw new Error('Invalid email');
+                throw new BaseError(
+                    HttpStatusCode.BAD_REQUEST,
+                    'fail',
+                    'Invalid email',
+                );
             }
         }
         if (data.password != null) {
             if (this.validatePassword.validate(data.password) == false) {
                 console.log('Invalid password');
-                throw new Error('Invalid password');
+                throw new BaseError(
+                    HttpStatusCode.BAD_REQUEST,
+                    'fail',
+                    'Invalid password',
+                );
             }
         }
         if (data.phone_number != null) {
             if (this.validatePhone.validate(data.phone_number) == false) {
                 console.log('Invalid phone number');
-                throw new Error('Invalid phone number');
+                throw new BaseError(
+                    HttpStatusCode.BAD_REQUEST,
+                    'fail',
+                    'Invalid phone number',
+                );
             }
         }
-        await AppDataSource.manager.update(Employee, { id: id }, data);
-    }
-    async login(email: string, password: string): Promise<void> {
         const result: any = await AppDataSource.manager.find(Employee, {
             where: {
-                email: email,
+                id: id,
             },
         });
         if (result[0] == null) {
-            throw new Error('Error: User does not exist');
+            throw new BaseError(
+                HttpStatusCode.BAD_REQUEST,
+                'fail',
+                'User does not exist',
+            );
         }
-        const match: any = await this.hashPassWord.compare(
-            password,
-            result[0].password,
-        );
-        if (match) {
-            return result[0];
-        } else {
-            throw new Error('Error: Login failed');
+        try {
+            await AppDataSource.manager.update(Employee, { id: id }, data);
+        } catch (error: any) {
+            throw new BaseError(
+                HttpStatusCode.INTERNAL_SERVER,
+                'fail',
+                error.message,
+            );
+        }
+    }
+    async login(email: string, password: string): Promise<void> {
+        try {
+            const result: any = await AppDataSource.manager.find(Employee, {
+                where: {
+                    email: email,
+                },
+            });
+            if (result[0] == null) {
+                throw new BaseError(
+                    HttpStatusCode.BAD_REQUEST,
+                    'fail',
+                    'User does not exist',
+                );
+            }
+            const match: any = await this.hashPassWord.compare(
+                password,
+                result[0].password,
+            );
+            if (match) {
+                return result[0];
+            } else {
+                throw new BaseError(
+                    HttpStatusCode.UNAUTHORIZED,
+                    'fail',
+                    'Login failed',
+                );
+            }
+        } catch (error: any) {
+            throw new BaseError(
+                HttpStatusCode.INTERNAL_SERVER,
+                'fail',
+                error.message,
+            );
         }
     }
 

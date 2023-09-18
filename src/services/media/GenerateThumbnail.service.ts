@@ -8,6 +8,8 @@ const exec = util.promisify(require('child_process').exec);
 const fs = require('fs');
 import { FfmpegProgressBar } from './FfmpegProgressBar.service';
 import 'reflect-metadata';
+import BaseError from '../../utils/BaseError';
+import { HttpStatusCode } from '../../utils/ErrorStatusCode';
 @injectable()
 export class GenerateThumbnail implements GenerateThumbnailInterface {
     public async generate(
@@ -16,10 +18,18 @@ export class GenerateThumbnail implements GenerateThumbnailInterface {
         numberOfFrames: number,
     ) {
         var videoDuration: any;
-        await getVideoDurationInSeconds(file).then((duration: any) => {
-            console.log(duration);
-            videoDuration = duration;
-        });
+        await getVideoDurationInSeconds(file)
+            .then((duration: any) => {
+                console.log(duration);
+                videoDuration = duration;
+            })
+            .catch((error: any) => {
+                throw new BaseError(
+                    HttpStatusCode.INTERNAL_SERVER,
+                    'fail',
+                    'Cant get file frame' + error,
+                );
+            });
         var distance = videoDuration / 10;
         console.log('distance' + distance);
         fs.mkdirSync(process.env.ROOT + '/storage/data/thumbnail/' + filename);
@@ -54,6 +64,11 @@ export class GenerateThumbnail implements GenerateThumbnailInterface {
             console.log('Done generate thumbnail');
         } catch (error) {
             console.error(error);
+            throw new BaseError(
+                HttpStatusCode.INTERNAL_SERVER,
+                'fail',
+                'Cant generate thumbnail. Error: ' + error,
+            );
         }
     }
 }

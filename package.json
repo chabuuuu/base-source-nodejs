@@ -45,6 +45,7 @@
     "get-video-duration": "^4.1.0",
     "husky": "^8.0.3",
     "inversify": "^6.0.1",
+    "jsonwebtoken": "^9.0.2",
     "lint-staged": "^14.0.1",
     "method-override": "^3.0.0",
     "morgan": "^1.10.0",

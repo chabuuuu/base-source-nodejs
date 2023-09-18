@@ -8,6 +8,8 @@ import { spawnSync } from 'child_process';
 import { unlinkSync } from 'fs';
 import { spawn } from 'child_process';
 import { FfmpegProgressBar } from './FfmpegProgressBar.service';
+import BaseError from '../../utils/BaseError';
+import { HttpStatusCode } from '../../utils/ErrorStatusCode';
 
 @injectable()
 export class ResizeVideo implements ResizeVideoInterFace {
@@ -34,7 +36,11 @@ export class ResizeVideo implements ResizeVideoInterFace {
             console.log('Successfully deleted');
         } catch (error) {
             console.error(error);
-            throw error;
+            throw new BaseError(
+                HttpStatusCode.INTERNAL_SERVER,
+                'fail',
+                'Cant resize video' + error,
+            );
         }
     }
 }

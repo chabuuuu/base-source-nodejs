@@ -87,22 +87,25 @@ export class MediaUploadService implements MediaUploadInterface {
             console.log('Insert video...');
 
             console.log('resize video...');
+            try {
+                await this.resizeVideo.resize(
+                    this.inputFilePath,
+                    this.width,
+                    this.height,
+                    this.outputFilePath,
+                    this.fileName,
+                    this.fileType,
+                );
 
-            await this.resizeVideo.resize(
-                this.inputFilePath,
-                this.width,
-                this.height,
-                this.outputFilePath,
-                this.fileName,
-                this.fileType,
-            );
-
-            console.log('Generate thumbnail...');
-            await this.generateThumbnail.generate(
-                this.outputFilePath,
-                this.fileName,
-                this.thumbnailNumber,
-            );
+                console.log('Generate thumbnail...');
+                await this.generateThumbnail.generate(
+                    this.outputFilePath,
+                    this.fileName,
+                    this.thumbnailNumber,
+                );
+            } catch (error: any) {
+                next(error);
+            }
         } else {
             try {
                 await sharp('storage/data/' + this.fileName)
@@ -113,8 +116,9 @@ export class MediaUploadService implements MediaUploadInterface {
                     .toFile('storage/data/' + 'resize_' + this.fileName);
                 await unlink('storage/data/' + this.fileName);
                 console.log('successfully deleted');
-            } catch (error) {
+            } catch (error: any) {
                 console.log(error);
+                next(error);
             }
         }
 

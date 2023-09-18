@@ -18,7 +18,7 @@ export class EmployeeController {
     }
     async readAllData(req: any, res: any, next: any) {
         var query: any = req.query.query;
-        const page: any = req.query.page || 10;
+        const page: any = req.query.page || 1;
         const perPage: any = req.query.perPage || 10;
         const skip = (page - 1) * perPage;
         var filterData = {
@@ -48,7 +48,10 @@ export class EmployeeController {
         try {
             await employeeService.deleteData(id);
             console.log('Delete done!');
-            res.send('Delete done! ID: ' + id);
+            res.json({
+                status: 200,
+                message: 'Delete done! ID: ' + id,
+            });
         } catch (error) {
             next(error);
         }

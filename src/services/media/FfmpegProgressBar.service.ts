@@ -23,7 +23,7 @@ export class FfmpegProgressBar {
             if (frameMatch) {
                 var frameValue = Number(frameMatch[1].match(/\d+/));
                 this.frameCount = frameValue;
-                console.log(`Tổng số frame: ${frameValue}`);
+                // console.log(`Tổng số frame: ${frameValue}`);
             } else {
                 throw new Error('Can not read frame of this file.');
             }
