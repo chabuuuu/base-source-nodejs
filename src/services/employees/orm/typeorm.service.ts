@@ -19,6 +19,7 @@ import BaseError from '../../../utils/BaseError';
 import { HttpStatusCode } from '../../../utils/ErrorStatusCode';
 const db = require('../../../data-source/index');
 const { schema, validate } = require('../../../Schema/EmployeeSchema');
+const jwt = require('jsonwebtoken');
 
 @injectable()
 export class TypeORMService implements ORMInterface {
@@ -313,7 +314,13 @@ export class TypeORMService implements ORMInterface {
                 result[0].password,
             );
             if (match) {
-                return result[0];
+                const token = jwt.sign(
+                    { email: email, password: password },
+                    process.env.JWT_SECRET,
+                    { expiresIn: process.env.JWT_EXPIRES_IN },
+                );
+                console.log(token);
+                return token;
             } else {
                 throw new BaseError(
                     HttpStatusCode.UNAUTHORIZED,

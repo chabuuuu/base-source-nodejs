@@ -21,6 +21,8 @@ import {
 import BaseError from '../../../utils/BaseError';
 const prisma = new PrismaClient();
 const { schema, validate } = require('../../../Schema/EmployeeSchema');
+const jwt = require('jsonwebtoken');
+
 @injectable()
 export class PrismaService implements ORMInterface {
     private hashPassWord: HashPasswordInterface;
@@ -163,13 +165,13 @@ export class PrismaService implements ORMInterface {
             const totalCount: any =
                 await prisma.$queryRawUnsafe(totalCountQuery);
             console.log('Done read data');
-            console.log(totalCount);
+            console.log(totalCount[0].total);
 
             const result: any = {
                 data: data,
                 page: page,
                 perPage: perPage,
-                totalCount: totalCount[0].toString(),
+                totalCount: totalCount[0].total.toString(),
             };
             return result;
         } catch (error: any) {
@@ -318,7 +320,13 @@ export class PrismaService implements ORMInterface {
                 result.password,
             );
             if (match) {
-                return result;
+                const token = jwt.sign(
+                    { email: email, password: password },
+                    process.env.JWT_SECRET,
+                    { expiresIn: process.env.JWT_EXPIRES_IN },
+                );
+                console.log(token);
+                return token;
             } else {
                 throw new BaseError(
                     HttpStatusCode.UNAUTHORIZED,
