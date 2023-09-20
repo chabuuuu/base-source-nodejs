@@ -32,7 +32,11 @@ export class GenerateThumbnail implements GenerateThumbnailInterface {
             });
         var distance = videoDuration / 10;
         console.log('distance' + distance);
-        fs.mkdirSync(process.env.ROOT + '/storage/data/thumbnail/' + filename);
+        try {
+            fs.mkdirSync(process.env.ROOT + '/storage/data/thumbnail/' + filename);
+        } catch (error) {
+            throw new BaseError(HttpStatusCode.INTERNAL_SERVER, 'fail', 'Cant create folder for this thumbnail')
+        }
         const outputPattern =
             process.env.ROOT +
             '/storage/data/thumbnail/' +
