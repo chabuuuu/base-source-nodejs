@@ -1,23 +1,22 @@
 import { RedisClientType, createClient } from 'redis';
-
+import { employeeRepository } from './om/person';
+import client from './om/client';
 export class RedisService {
-    private client: RedisClientType;
     constructor() {
-        this.client = createClient();
-        this.client.on('error', (err) =>
-            console.log('Redis Client Error', err),
-        );
+        this.connect();
     }
 
     async connect() {
-        await this.client.connect();
-        console.log('Connected to redis');
+        await client.connect();
+        await employeeRepository.createIndex();
+        console.log('Done create redis index');
     }
 
-    async test() {
-        await this.client.set('key', 'value');
-        const value = await this.client.get('key');
-        console.log(value);
-    }
+    async test() {}
     async addData(data: any) {}
+    async readData(data: any) {
+        var allData;
+        allData = await employeeRepository.search().return.all();
+        return allData;
+    }
 }
