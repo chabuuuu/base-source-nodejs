@@ -7,13 +7,20 @@ import { RedisService } from './redis/redis.service';
 export class EmployeeService {
     private orm: ORMInterface;
     private redis: RedisService;
+    private totalEMployee: number;
 
     constructor(
         @inject('ORMInterface') private readonly ormService: ORMInterface,
     ) {
+        this.totalEMployee = 0;
         this.orm = ormService;
         this.redis = new RedisService();
         this.redis.connect();
+        this.countRecord();
+    }
+    async countRecord() {
+        this.totalEMployee = await this.orm.countRecord();
+        console.log('Employee records: ' + this.totalEMployee);
     }
 
     async connectORM() {

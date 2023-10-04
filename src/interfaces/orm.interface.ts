@@ -5,6 +5,7 @@ interface ORMInterface {
     updateData(id: number, data: any): Promise<void>;
     deleteData(id: number): Promise<void>;
     login(email: string, password: string): Promise<void>;
+    countRecord(): Promise<number>;
 }
 // interface EmployeeData {
 //     full_name: string;

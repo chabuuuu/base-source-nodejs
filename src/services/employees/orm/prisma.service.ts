@@ -342,6 +342,13 @@ export class PrismaService implements ORMInterface {
             );
         }
     }
+    async countRecord(): Promise<number> {
+        var count = 0;
+        const totalCountQuery = `SELECT COUNT(*) AS total FROM "Employee"`;
+        const totalRecord: any = await prisma.$queryRawUnsafe(totalCountQuery);
+        count = totalRecord[0].total;
+        return count;
+    }
 
     // Triển khai các phương thức tương tự cho thêm, xóa, sửa dữ liệu
 }

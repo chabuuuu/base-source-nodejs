@@ -336,6 +336,11 @@ export class TypeORMService implements ORMInterface {
             );
         }
     }
+    async countRecord(): Promise<number> {
+        var count = 0;
+
+        return count;
+    }
 
     // Triển khai các phương thức tương tự cho thêm, xóa, sửa dữ liệu
 }
