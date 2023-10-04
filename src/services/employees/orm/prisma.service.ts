@@ -252,7 +252,9 @@ export class PrismaService implements ORMInterface {
                 validate.errors[0].message,
             );
         }
-        data.salary = Number(data.salary);
+        if (data.salary != null) {
+            data.salary = Number(data.salary);
+        }
         id = Number(id);
         if (data.email != null) {
             const emailUnique = await prisma.employee.findMany({

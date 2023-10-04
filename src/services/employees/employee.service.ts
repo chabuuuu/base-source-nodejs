@@ -66,7 +66,13 @@ export class EmployeeService {
         return data;
     }
     async updateData(id: number, data: any): Promise<void> {
-        return await this.orm.updateData(id, data);
+        try {
+            const respond = await this.orm.updateData(id, data);
+            await this.redis.update(id, data);
+            return respond;
+        } catch (error) {
+            throw error;
+        }
     }
     async deleteData(id: number): Promise<void> {
         try {
