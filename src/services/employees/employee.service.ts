@@ -1,22 +1,34 @@
 import { injectable, inject } from 'inversify';
 import 'reflect-metadata';
 import { ORMInterface } from '../../interfaces/orm.interface';
+import { RedisService } from './redis/redis.service';
 
 @injectable()
 export class EmployeeService {
     private orm: ORMInterface;
+    private redis: RedisService;
 
     constructor(
         @inject('ORMInterface') private readonly ormService: ORMInterface,
     ) {
         this.orm = ormService;
+        this.redis = new RedisService();
+        this.redis.connect();
     }
 
     async connectORM() {
+        console.log('Connect to orm');
         await this.orm.connect();
     }
     async addData(data: any): Promise<void> {
-        return await this.orm.addData(data);
+        var result: any;
+        try {
+            result = await this.orm.addData(data);
+            await this.redis.test();
+        } catch (err: any) {
+            return err;
+        }
+        return result;
     }
     async readData(
         filter: object,

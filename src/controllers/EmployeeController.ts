@@ -8,6 +8,7 @@ const convertStringToObject = container.get<ConverStringToObjectInterface>(
 );
 export class EmployeeController {
     async addData(req: any, res: any, next: any) {
+        await employeeService.connectORM();
         const data = req.body;
         try {
             const result: any = await employeeService.addData(data);

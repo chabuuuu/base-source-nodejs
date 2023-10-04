@@ -5,6 +5,7 @@ import 'dotenv/config';
 import { error } from 'console';
 import { ErrorWithStatus } from './interfaces/ErrorWithStatus.interface';
 import BaseError from './utils/BaseError';
+import { RedisService } from './services/employees/redis/redis.service';
 const path = require('path');
 const route = require('./routes/index');
 const app = express();
@@ -38,6 +39,10 @@ app.engine(
 
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'resources', 'views'));
+
+// const redisService = new RedisService();
+// redisService.connect();
+// redisService.test();
 
 route(app);
 
