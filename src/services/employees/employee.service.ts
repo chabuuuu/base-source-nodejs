@@ -15,7 +15,6 @@ export class EmployeeService {
         this.totalEMployee = 0;
         this.orm = ormService;
         this.redis = new RedisService();
-        // this.redis.connect();
         this.countRecord();
     }
     async countRecord() {
@@ -36,7 +35,8 @@ export class EmployeeService {
         var result: any;
         try {
             result = await this.orm.addData(data);
-            await this.redis.test();
+            await this.redis.addData(data);
+            this.totalEMployee++;
         } catch (err: any) {
             return err;
         }
@@ -48,7 +48,20 @@ export class EmployeeService {
         perPage: any,
         skip: any,
     ): Promise<void> {
-        return await this.orm.readData(filter, page, perPage, skip);
+        var data;
+        var countRedis = 0;
+        countRedis = await this.redis.count();
+        console.log('Total employee record on redis: ' + countRedis);
+        if (countRedis == this.totalEMployee) {
+            data = await this.redis.readData('');
+            console.log('Read data on redis');
+        } else {
+            data = await this.orm.readData(filter, page, perPage, skip);
+            console.log('Read data on normal database');
+            await this.redis.syncWithDB(data);
+            console.log('Done clear all data on redis');
+        }
+        return data;
     }
     async updateData(id: number, data: any): Promise<void> {
         return await this.orm.updateData(id, data);
