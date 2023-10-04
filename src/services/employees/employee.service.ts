@@ -2,6 +2,7 @@ import { injectable, inject } from 'inversify';
 import 'reflect-metadata';
 import { ORMInterface } from '../../interfaces/orm.interface';
 import { RedisService } from './redis/redis.service';
+import BaseError from '../../utils/BaseError';
 
 @injectable()
 export class EmployeeService {
@@ -35,10 +36,11 @@ export class EmployeeService {
         var result: any;
         try {
             result = await this.orm.addData(data);
-            await this.redis.addData(data);
+            await this.redis.addData(data, result.id);
             this.totalEMployee++;
         } catch (err: any) {
-            return err;
+            throw err;
+            // return err;
         }
         return result;
     }
@@ -67,7 +69,13 @@ export class EmployeeService {
         return await this.orm.updateData(id, data);
     }
     async deleteData(id: number): Promise<void> {
-        return await this.orm.deleteData(id);
+        try {
+            const respond = await this.orm.deleteData(id);
+            await this.redis.delete(id);
+            return respond;
+        } catch (error) {
+            throw error;
+        }
     }
     async login(email: string, password: string): Promise<void> {
         return await this.orm.login(email, password);

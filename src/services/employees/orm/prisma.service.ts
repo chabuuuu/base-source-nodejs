@@ -120,9 +120,11 @@ export class PrismaService implements ORMInterface {
                 'Invalid phone number',
             );
         }
-        await prisma.employee.create({
+        var getId = await prisma.employee.create({
             data: data,
         });
+
+        data.id = getId.id;
         const respond: any = data;
         console.log('done add data');
 

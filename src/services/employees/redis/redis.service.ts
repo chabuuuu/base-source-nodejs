@@ -1,6 +1,7 @@
 import { RedisClientType, createClient } from 'redis';
 import { employeeRepository } from './om/person';
 import client from './om/client';
+import { EntityId } from 'redis-om';
 export class RedisService {
     constructor() {
         this.connect();
@@ -13,9 +14,9 @@ export class RedisService {
     }
 
     async test() {}
-    async addData(data: any) {
+    async addData(data: any, id: any) {
         console.log(data);
-        data.id = Number(data.id);
+        data.id = Number(id);
         data.date_of_birth = new Date(data.date_of_birth);
         data.start_date = new Date(data.start_date);
         try {
@@ -41,6 +42,19 @@ export class RedisService {
         await employeeRepository.createIndex();
         for (const element of dataList) {
             await employeeRepository.save(element);
+        }
+    }
+    async delete(id: any) {
+        const employee = await employeeRepository
+            .search()
+            .where('id')
+            .equals(Number(id))
+            .return.first();
+        if (employee != null) {
+            var redisId: any = employee[EntityId];
+            console.log('ID of employee we will delete: ' + redisId);
+            await employeeRepository.remove(redisId);
+            console.log('Delete employee from redis!');
         }
     }
 }
