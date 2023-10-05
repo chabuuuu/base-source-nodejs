@@ -23,10 +23,10 @@ export class EmployeeService {
         console.log('Employee records: ' + this.totalEMployee);
     }
 
-    async test() {
-        var data = await this.redis.readData('');
-        return data;
-    }
+    // async test() {
+    //     var data = await this.redis.readData('');
+    //     return data;
+    // }
 
     async connectORM() {
         console.log('Connect to orm');
@@ -55,7 +55,13 @@ export class EmployeeService {
         countRedis = await this.redis.count();
         console.log('Total employee record on redis: ' + countRedis);
         if (countRedis == this.totalEMployee) {
-            data = await this.redis.readData('');
+            data = await this.redis.readData(
+                filter,
+                page,
+                perPage,
+                skip,
+                countRedis,
+            );
             console.log('Read data on redis');
         } else {
             data = await this.orm.readData(filter, page, perPage, skip);

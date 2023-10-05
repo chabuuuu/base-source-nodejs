@@ -174,6 +174,7 @@ export class PrismaService implements ORMInterface {
                 page: page,
                 perPage: perPage,
                 totalCount: totalCount[0].total.toString(),
+                from: 'prisma',
             };
             return result;
         } catch (error: any) {

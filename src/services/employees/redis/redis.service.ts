@@ -1,7 +1,7 @@
 import { RedisClientType, createClient } from 'redis';
 import { employeeRepository } from './om/person';
 import client from './om/client';
-import { EntityId } from 'redis-om';
+import { Entity, EntityId } from 'redis-om';
 export class RedisService {
     constructor() {
         this.connect();
@@ -25,10 +25,78 @@ export class RedisService {
             throw new Error(error.message);
         }
     }
-    async readData(data: any): Promise<any> {
-        var allData;
-        allData = await employeeRepository.search().return.all();
-        return allData;
+    async readData(
+        filter: any,
+        page: any,
+        perPage: any,
+        skip: any,
+        total: number,
+    ): Promise<any> {
+        var data;
+        const monthBirth = filter.monthBirth;
+        const gender = filter.gender;
+        page = page?.toString();
+        perPage = perPage?.toString();
+        skip = skip?.toString();
+        data = await employeeRepository.search().return.page(skip, perPage);
+        if (monthBirth != null || gender != null) {
+            var filterData: Array<any> = data;
+
+            if (gender != null) {
+                var genderDataFilter = await employeeRepository
+                    .search()
+                    .where('gender')
+                    .equals(gender)
+                    .return.all();
+                filterData = genderDataFilter;
+                console.log('FIlter by gender' + filterData);
+            }
+            if (monthBirth != null) {
+                console.log('filterdata length: ' + filterData.length);
+
+                // for (var i = 0; i < filterData.length; i++) {
+                //     console.log(filterData[i].date_of_birth.toISOString());
+
+                //     var data_mothBirth = filterData[i]?.date_of_birth?.toISOString().substring(5,7);
+                //     console.log(data_mothBirth);
+                //     console.log("monthbirth" + monthBirth);
+
+                //     // if ( data_mothBirth.localeCompare(monthBirth.toString()) != 0){
+                //     //     // filterData.push(data[i]);
+                //     //     console.log(filterData[i]?.date_of_birth);
+
+                //     //     filterData = filterData.splice(Number(i), 1);
+                //     // }
+                // }
+
+                filterData = filterData.filter(function (item) {
+                    return (
+                        item.date_of_birth
+                            .toISOString()
+                            .substring(5, 7)
+                            .localeCompare(monthBirth) == 0
+                    );
+                });
+
+                console.log('Filter by month' + filterData);
+            }
+            const result: any = {
+                data: filterData,
+                totalCount: filterData.length,
+                from: 'redis',
+            };
+            return result;
+            // console.log(monthBirth, gender);
+        } else {
+            const result: any = {
+                data: data,
+                page: page,
+                perPage: perPage,
+                totalCount: total,
+                from: 'redis',
+            };
+            return result;
+        }
     }
     async count(): Promise<number> {
         var count = await employeeRepository.search().returnCount();
