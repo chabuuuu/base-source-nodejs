@@ -40,7 +40,7 @@ export class TypeORMService implements ORMInterface {
     }
     async connect() {
         // Kết nối với TypeORM
-        db.connect();
+        await db.connect();
     }
     async addData(data: any): Promise<void> {
         if (validate(data) == false) {
@@ -152,6 +152,7 @@ export class TypeORMService implements ORMInterface {
                 page: page,
                 perPage: perPage,
                 totalCount: totalCount[0],
+                from: 'typeorm',
             };
             return result;
         } catch (error: any) {
@@ -338,7 +339,9 @@ export class TypeORMService implements ORMInterface {
     }
     async countRecord(): Promise<number> {
         var count = 0;
-
+        const totalCountQuery = `SELECT COUNT(*) AS total FROM "Employee"`;
+        const totalCount = await AppDataSource.manager.query(totalCountQuery);
+        count = totalCount[0].total;
         return count;
     }
 

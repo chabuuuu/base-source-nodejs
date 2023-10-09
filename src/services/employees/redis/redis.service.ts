@@ -19,6 +19,8 @@ export class RedisService {
         data.id = Number(id);
         data.date_of_birth = new Date(data.date_of_birth);
         data.start_date = new Date(data.start_date);
+        data.salary = Number(data.salary);
+
         try {
             const employee = await employeeRepository.save(data);
         } catch (error: any) {

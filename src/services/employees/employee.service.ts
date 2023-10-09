@@ -22,6 +22,7 @@ export class EmployeeService {
         this.countRecord();
     }
     async countRecord() {
+        await this.connectORM();
         this.totalEMployee = await this.orm.countRecord();
         console.log('Employee records: ' + this.totalEMployee);
     }
@@ -39,8 +40,8 @@ export class EmployeeService {
         var result: any;
         try {
             result = await this.orm.addData(data);
-            await this.redis.addData(data, result.id);
             await this.mongodb.addData(data, result.id);
+            await this.redis.addData(data, result.id);
             this.totalEMployee++;
         } catch (err: any) {
             throw err;
